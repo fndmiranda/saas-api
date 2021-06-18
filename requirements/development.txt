@@ -9,3 +9,4 @@ bandit==1.7.0
 safety==1.10.3
 factory-boy==3.2.0
 pytest-cov==2.12.1
+pytest-deadfixtures==2.2.1

@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import APIRouter, Depends, status
 
 from app.config import Settings
@@ -7,7 +5,6 @@ from app.dependencies import get_settings
 from app.version import __version__
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
 
 
 @router.get("/", summary="Application root.", status_code=status.HTTP_200_OK)
