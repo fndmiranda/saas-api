@@ -3,10 +3,10 @@ import logging
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.account import services
 from app.account.schemas import Account, AccountCreate
 from app.dependencies import get_session
-from app.oauth.depends import get_current_user
-from app.user.services import UserService
+from app.oauth.depends import get_current_user_verified
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ async def create_account(
 ):
     logger.info("Starting create user account")
 
-    response = await UserService().create(session=session, account=account)
+    response = await services.create(session=session, account=account)
 
     logger.info(
         "Response of create user account with={}".format(
@@ -39,7 +39,7 @@ async def create_account(
     summary="Get account.",
     response_model=Account,
 )
-async def get_account(*, current_user: Account = Depends(get_current_user)):
+async def get_account(*, current_user: Account = Depends(get_current_user_verified)):
     logger.info(
         "Response of get user account with={}".format(
             {"user_id": current_user.id}

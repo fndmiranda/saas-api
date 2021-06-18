@@ -6,7 +6,7 @@ from app.account.schemas import AccountCreate
 from app.database import async_session
 from app.main import api_router
 from app.oauth.services import create_access_token
-from app.user.services import UserService
+from app.account import services
 
 
 @pytest.mark.asyncio
@@ -31,8 +31,8 @@ async def test_account_view_should_get_account(
     """Test account view should get account."""
 
     async with async_session() as session:
-        user = await UserService().create(
-            session=session, account=AccountCreate(**account_create_body)
+        user = await services.create(
+            session=session, account=AccountCreate(**account_create_body), email_verified=True
         )
 
     token = await create_access_token(user=user)

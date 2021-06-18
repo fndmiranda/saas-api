@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ITEMS_PER_USER: int = 50
     SQLALCHEMY_DATABASE_URI: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCOUNT_EMAIL_VERIFY_ENABLE: bool = True
     ALGORITHM: str = "HS256"
     SECRET_KEY: str
 

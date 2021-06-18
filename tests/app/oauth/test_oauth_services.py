@@ -3,7 +3,7 @@ import pytest
 from app.account.schemas import AccountCreate
 from app.database import async_session
 from app.oauth.services import authenticate_user
-from app.user.services import UserService
+from app.account import services
 
 
 @pytest.mark.asyncio
@@ -13,8 +13,8 @@ async def test_oauth_service_should_authenticate_user(
     """Test oauth service should authenticate user."""
 
     async with async_session() as session:
-        await UserService().create(
-            session=session, account=AccountCreate(**account_create_body)
+        await services.create(
+            session=session, account=AccountCreate(**account_create_body), email_verified=True
         )
 
     user = await authenticate_user(
@@ -32,7 +32,7 @@ async def test_oauth_service_not_should_authenticate_user(
     """Test oauth service not should authenticate user."""
 
     async with async_session() as session:
-        await UserService().create(
+        await services.create(
             session=session, account=AccountCreate(**account_create_body)
         )
 

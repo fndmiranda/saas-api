@@ -2,22 +2,22 @@ import pytest
 
 from app.account.schemas import AccountCreate
 from app.database import async_session
-from app.user.services import UserService
+from app.account import services
 
 
 @pytest.mark.asyncio
-async def test_user_service_not_should_create_user_duplicated(
+async def test_account_service_not_should_create_duplicated(
     app, account_create_body
 ):
-    """Test user service not should create user duplicated."""
+    """Test account service not should create duplicated."""
 
     async with async_session() as session:
-        await UserService().create(
+        await services.create(
             session=session, account=AccountCreate(**account_create_body)
         )
 
     with pytest.raises(Exception):
         async with async_session() as session:
-            await UserService().create(
+            await services.create(
                 session=session, account=AccountCreate(**account_create_body)
             )

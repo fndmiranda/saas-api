@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from app.account.schemas import AccountCreate
 from app.database import async_session
 from app.main import api_router
-from app.user.services import UserService
+from app.account import services
 
 
 @pytest.mark.asyncio
@@ -15,7 +15,7 @@ async def test_oauth_view_should_create_token(
     """Test oauth view should create token."""
 
     async with async_session() as session:
-        await UserService().create(
+        await services.create(
             session=session, account=AccountCreate(**account_create_body)
         )
 
@@ -41,7 +41,7 @@ async def test_oauth_view_not_should_create_token(
     """Test oauth view not should create token."""
 
     async with async_session() as session:
-        await UserService().create(
+        await services.create(
             session=session, account=AccountCreate(**account_create_body)
         )
 
