@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from alembic import command
 from alembic.config import Config
 from app.config import Settings
-from app.dependencies import get_settings
+from app.depends import get_settings
 from app.main import app
 
 pytest_plugins = [

@@ -6,14 +6,14 @@ from app.oauth.views import router as oauth_router
 from app.version import __version__
 
 app = FastAPI(
-    title="FastAPI",
-    description="Project description",
+    title="PapitoPet API",
+    description="Core api of the PapitoPet",
     version=__version__,
 )
 
 
 api_router = APIRouter()
 api_router.include_router(core_router, tags=["core"])
-api_router.include_router(account_router, prefix="/account", tags=["accounts"])
+api_router.include_router(account_router, prefix="/account", tags=["account"])
 api_router.include_router(oauth_router, prefix="/oauth", tags=["oauth"])
 app.include_router(api_router)

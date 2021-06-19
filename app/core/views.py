@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 
-from app.config import Settings
-from app.dependencies import get_settings
+from app.config import get_settings
 from app.version import __version__
 
 router = APIRouter()
 
 
 @router.get("/", summary="Application root.", status_code=status.HTTP_200_OK)
-async def root(settings: Settings = Depends(get_settings)):
+async def root():
+    settings = get_settings()
     return {"application": f"{settings.APP_NAME} - {__version__}"}
 
 

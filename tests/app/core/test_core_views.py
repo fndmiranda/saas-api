@@ -2,7 +2,7 @@ import pytest
 from fastapi import FastAPI, status
 from httpx import AsyncClient
 
-from app.dependencies import get_settings
+from app.depends import get_settings
 from app.main import api_router
 from app.version import __version__
 

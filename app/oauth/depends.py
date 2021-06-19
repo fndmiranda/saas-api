@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.config import get_settings
-from app.dependencies import get_session
+from app.depends import get_session
 from app.user.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -44,6 +44,11 @@ async def get_current_user(
 async def get_current_user_verified(
     current_user: User = Depends(get_current_user),
 ):
-    if current_user.email_verified_at is None:
+    settings = get_settings()
+
+    if (
+        settings.ACCOUNT_EMAIL_VERIFY_ENABLE
+        and current_user.email_verified_at is None
+    ):
         raise HTTPException(status_code=403, detail="Email not verified")
     return current_user

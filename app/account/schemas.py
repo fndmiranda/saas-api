@@ -33,9 +33,9 @@ class AccountBase(UserBase):
     email: str
     nickname: str
     document_number: str
+    accept_legal_term: bool
     is_admin: bool = False
     is_celebrity: bool = False
-    accept_legal_term: bool = False
     birthdate: date = None
 
     @validator("accept_legal_term")

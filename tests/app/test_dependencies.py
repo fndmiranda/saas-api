@@ -1,7 +1,7 @@
 import pytest
 
 from app.config import Settings
-from app.dependencies import get_settings
+from app.depends import get_settings
 
 
 @pytest.mark.asyncio
