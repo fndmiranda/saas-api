@@ -39,7 +39,7 @@ class AccountBase(UserBase):
     birthdate: date = None
 
     @validator("accept_legal_term")
-    def accept_legal_term(cls, v, values, **kwargs):
+    def accept_legal_term(cls, v, values):
         if not v:
             raise ValueError("Accept legal term is not acceptable.")
         return v

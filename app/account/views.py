@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.account import services
 from app.account.schemas import Account, AccountCreate, AccountUpdate
+from app.account.validators import validate_account
 from app.depends import get_session
 from app.oauth.depends import get_current_user_verified
 
@@ -24,8 +25,18 @@ async def create_account(
 ):
     logger.info("Starting create user account")
 
+    await validate_account(session=session, account_in=account_in)
+
     try:
         account = await services.create(session=session, account_in=account_in)
+        logger.info(
+            "User account created successfully with={}".format(
+                {
+                    "user_id": account.id,
+                }
+            )
+        )
+        return account
     except Exception as e:
         logger.error(
             "Error in try create user account with with={}".format(
@@ -35,14 +46,6 @@ async def create_account(
             )
         )
         raise HTTPException(status_code=400, detail=str(e))
-
-    logger.info(
-        "Response of create user account with={}".format(
-            {"user_id": account.id}
-        )
-    )
-
-    return account
 
 
 @router.get(
@@ -72,6 +75,10 @@ async def update_account(
     account: Account = Depends(get_current_user_verified),
     account_in: AccountUpdate
 ):
+    await validate_account(
+        session=session, account_in=account_in, account=account
+    )
+
     await services.update(
         session=session, account=account, account_in=account_in
     )

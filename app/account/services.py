@@ -14,33 +14,15 @@ async def create(
     email_verified: bool = False,
 ):
     """Create a new user account."""
-    try:
-        create_data = account_in.dict()
+    create_data = account_in.dict()
 
-        if email_verified:
-            create_data.update({"email_verified_at": datetime.now()})
+    if email_verified:
+        create_data.update({"email_verified_at": datetime.now()})
 
-        instance = User(**create_data)
-        session.add(instance)
-        await session.commit()
-        logger.info(
-            "User account created successfully with={}".format(
-                {
-                    "user_id": instance.id,
-                }
-            )
-        )
-        return instance
-    except Exception as e:
-        await session.rollback()
-        logger.error(
-            "Error in try create user account with with={}".format(
-                {
-                    "error": str(e),
-                }
-            )
-        )
-        raise Exception(str(e))
+    instance = User(**create_data)
+    session.add(instance)
+    await session.commit()
+    return instance
 
 
 async def update(
@@ -68,7 +50,6 @@ async def update(
 
         return account
     except Exception as e:
-        await session.rollback()
         logger.error(
             "Error in try update user account with with={}".format(
                 {
@@ -93,7 +74,6 @@ async def delete(*, session: AsyncSession, account: User):
             )
         )
     except Exception as e:
-        await session.rollback()
         logger.error(
             "Error in try delete user account with with={}".format(
                 {

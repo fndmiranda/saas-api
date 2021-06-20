@@ -1,9 +1,13 @@
+import logging
+
 from fastapi import APIRouter, FastAPI
 
 from app.account.views import router as account_router
 from app.core.views import router as core_router
 from app.oauth.views import router as oauth_router
 from app.version import __version__
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(
     title="PapitoPet API",

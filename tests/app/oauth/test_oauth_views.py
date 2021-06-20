@@ -10,18 +10,18 @@ from app.main import api_router
 
 @pytest.mark.asyncio
 async def test_oauth_view_should_create_token(
-    client: AsyncClient, account_create
+    client: AsyncClient, account_primary
 ):
     """Test oauth view should create token."""
 
     async with async_session() as session:
         await services.create(
-            session=session, account_in=AccountCreate(**account_create)
+            session=session, account_in=AccountCreate(**account_primary)
         )
 
     data = {
-        "username": account_create["email"],
-        "password": account_create["password"],
+        "username": account_primary["email"],
+        "password": account_primary["password"],
         "grant_type": "password",
     }
 
@@ -36,17 +36,17 @@ async def test_oauth_view_should_create_token(
 
 @pytest.mark.asyncio
 async def test_oauth_view_not_should_create_token(
-    client: AsyncClient, account_create
+    client: AsyncClient, account_primary
 ):
     """Test oauth view not should create token."""
 
     async with async_session() as session:
         await services.create(
-            session=session, account_in=AccountCreate(**account_create)
+            session=session, account_in=AccountCreate(**account_primary)
         )
 
     data = {
-        "username": account_create["email"],
+        "username": account_primary["email"],
         "password": "invalid",
         "grant_type": "password",
     }
