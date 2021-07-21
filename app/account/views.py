@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.account import services
 from app.account.schemas import Account, AccountCreate, AccountUpdate
 from app.account.validators import validate_account
+from app.auth.depends import get_current_user_verified
 from app.depends import get_session
-from app.oauth.depends import get_current_user_verified
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

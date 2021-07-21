@@ -2,8 +2,8 @@ import pytest
 
 from app.account import services
 from app.account.schemas import Account, AccountCreate, AccountUpdate
+from app.auth.services import authenticate_user
 from app.database import async_session
-from app.oauth.services import authenticate_user
 
 
 @pytest.mark.asyncio

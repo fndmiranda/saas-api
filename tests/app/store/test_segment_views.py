@@ -5,8 +5,8 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
+from app.auth.services import create_access_token
 from app.main import api_router
-from app.oauth.services import create_access_token
 from tests.app.store.factories import SegmentFactory
 from tests.app.user.factories import UserFactory
 

@@ -4,9 +4,9 @@ from httpx import AsyncClient
 
 from app.account import services
 from app.account.schemas import AccountCreate
+from app.auth.services import create_access_token
 from app.database import async_session
 from app.main import api_router
-from app.oauth.services import create_access_token
 from app.user.models import User
 
 

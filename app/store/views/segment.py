@@ -4,14 +4,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.depends import (
+    get_current_user_verified,
+    get_current_user_verified_admin,
+)
 from app.core.depends import common_parameters
 from app.core.schemas import SchemaPagination
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
-from app.oauth.depends import (
-    get_current_user_verified,
-    get_current_user_verified_admin,
-)
 from app.store.models import Segment as SegmentModel
 from app.store.schemas import Segment, SegmentCreate, SegmentUpdate
 from app.store.services.segment import create, delete, get, update

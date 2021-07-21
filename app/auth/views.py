@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import services
+from app.auth.schemas import Token
 from app.depends import get_session
-from app.oauth import services
-from app.oauth.schemas import Token
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
