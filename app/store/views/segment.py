@@ -31,14 +31,14 @@ async def get_segments(
     session: AsyncSession = Depends(get_session),
     common: dict = Depends(common_parameters),
 ):
-    logger.info(f"Starting get store segments with={common}")
+    logger.info(f"Starting get segments with={common}")
 
     pagination = await search_filter_sort_paginate(
         session=session, model=SegmentModel, **common
     )
 
     logger.info(
-        "Store segments got successfully with={}".format(
+        "Segments got successfully with={}".format(
             {
                 "page": pagination["page"],
                 "items": len(pagination["items"]),
@@ -64,7 +64,7 @@ async def create_segment(
     *, session: AsyncSession = Depends(get_session), segment_in: SegmentCreate
 ):
     logger.info(
-        "Starting create store segment with={}".format(
+        "Starting create segment with={}".format(
             {
                 "segment_in": segment_in,
             }
@@ -75,7 +75,7 @@ async def create_segment(
 
     segment = await create(session=session, segment_in=segment_in)
     logger.info(
-        "Store segment created successfully with={}".format(
+        "Segment created successfully with={}".format(
             {
                 "segment": segment,
             }
@@ -155,7 +155,7 @@ async def update_segment(
         session=session, segment_in=segment_in, segment=segment
     )
     logger.info(
-        "Segment update successfully with={}".format(
+        "Segment updated successfully with={}".format(
             {
                 "segment": segment.dict(),
             }
@@ -175,6 +175,10 @@ async def delete_segment(
     session: AsyncSession = Depends(get_session),
     segment_id: int,
 ):
+    logger.info(
+        "Starting delete segment with={}".format({"segment_id": segment_id})
+    )
+
     segment = await get(session=session, segment_id=segment_id)
 
     if not segment:
@@ -183,5 +187,13 @@ async def delete_segment(
         )
 
     await delete(session=session, segment=segment)
+
+    logger.info(
+        "Segment deleted successfully with={}".format(
+            {
+                "segment_id": segment_id,
+            }
+        )
+    )
 
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
