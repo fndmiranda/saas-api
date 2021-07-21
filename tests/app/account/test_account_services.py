@@ -55,7 +55,7 @@ async def test_account_service_should_update(
             session=session, account=account, account_in=schema_update
         )
 
-    updated = Account(**instance.to_dict()).dict()
+    updated = Account(**instance.dict()).dict()
 
     password = account_secondary["password"]
     account_secondary.pop("password")

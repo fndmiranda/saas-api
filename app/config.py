@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "PapitoPet API"
     ADMIN_EMAIL: str = "fndmiranda@gmail.com"
     LOG_LEVEL: str = "INFO"
+    DEFAULT_ITEMS_PER_PAGE: int = 5
+    MAX_ITEMS_PER_PAGE: int = 25
     SQLALCHEMY_WARN_20: int = 1
     ITEMS_PER_USER: int = 50
     SQLALCHEMY_DATABASE_URI: str

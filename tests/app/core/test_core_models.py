@@ -9,4 +9,4 @@ async def test_core_model_should_model_mixin(account_primary):
 
     user = User(**account_primary)
 
-    assert isinstance(user.to_dict(), dict)
+    assert isinstance(user.dict(), dict)

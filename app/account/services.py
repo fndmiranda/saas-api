@@ -29,56 +29,36 @@ async def update(
     *, session: AsyncSession, account: User, account_in: AccountUpdate
 ):
     """Update a user account."""
-    try:
-        account_data = jsonable_encoder(account)
-        update_data = account_in.dict(exclude_unset=True)
+    account_data = jsonable_encoder(account)
+    update_data = account_in.dict(exclude_unset=True)
 
-        for field in account_data:
-            if field in update_data:
-                setattr(account, field, update_data[field])
+    for field in account_data:
+        if field in update_data:
+            setattr(account, field, update_data[field])
 
-        session.add(account)
-        await session.commit()
+    session.add(account)
+    await session.commit()
 
-        logger.info(
-            "User account updated successfully with={}".format(
-                {
-                    "user_id": account.id,
-                }
-            )
+    logger.info(
+        "User account updated successfully with={}".format(
+            {
+                "user_id": account.id,
+            }
         )
+    )
 
-        return account
-    except Exception as e:
-        logger.error(
-            "Error in try update user account with with={}".format(
-                {
-                    "error": str(e),
-                }
-            )
-        )
-        raise Exception(str(e))
+    return account
 
 
 async def delete(*, session: AsyncSession, account: User):
     """Delete a user account."""
-    try:
-        await session.delete(account)
-        await session.commit()
+    await session.delete(account)
+    await session.commit()
 
-        logger.info(
-            "User account deleted successfully with={}".format(
-                {
-                    "user_id": account.id,
-                }
-            )
+    logger.info(
+        "User account deleted successfully with={}".format(
+            {
+                "user_id": account.id,
+            }
         )
-    except Exception as e:
-        logger.error(
-            "Error in try delete user account with with={}".format(
-                {
-                    "error": str(e),
-                }
-            )
-        )
-        raise Exception(str(e))
+    )

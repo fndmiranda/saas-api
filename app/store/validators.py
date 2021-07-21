@@ -3,23 +3,18 @@ from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.account.schemas import Account
-from app.user.models import User
+from app.store.models import Segment as SegmentModel
+from app.store.schemas import Segment
 
 
-async def validate_account(
-    *, session: AsyncSession, account_in: Account, account: Account = None
+async def validate_segment(
+    *, session: AsyncSession, segment_in: Segment, segment: Segment = None
 ):
-    clauses = (
-        User.email == account_in.email,
-        User.nickname == account_in.nickname,
-        User.document_number == account_in.document_number,
-    )
+    clauses = (SegmentModel.title == segment_in.title,)
+    stmt = select(SegmentModel).where(or_(*clauses))
 
-    stmt = select(User).where(or_(*clauses))
-
-    if account is not None:
-        stmt = stmt.where(User.id != account.id)
+    if segment is not None:
+        stmt = stmt.where(SegmentModel.id != segment.id)
 
     query = await session.execute(stmt.with_only_columns(func.count()))
 
@@ -27,9 +22,8 @@ async def validate_account(
 
     if query.scalar_one():
         detail = []
-
         for clause in clauses:
-            if getattr(account_in, clause.left.name) == clause.right.value:
+            if getattr(segment_in, clause.left.name) == clause.right.value:
                 detail.append(
                     {
                         "loc": ["body", clause.left.name],

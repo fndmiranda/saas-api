@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,25 +27,15 @@ async def create_account(
 
     await validate_account(session=session, account_in=account_in)
 
-    try:
-        account = await services.create(session=session, account_in=account_in)
-        logger.info(
-            "User account created successfully with={}".format(
-                {
-                    "user_id": account.id,
-                }
-            )
+    account = await services.create(session=session, account_in=account_in)
+    logger.info(
+        "User account created successfully with={}".format(
+            {
+                "user_id": account.id,
+            }
         )
-        return account
-    except Exception as e:
-        logger.error(
-            "Error in try create user account with with={}".format(
-                {
-                    "error": str(e),
-                }
-            )
-        )
-        raise HTTPException(status_code=400, detail=str(e))
+    )
+    return account
 
 
 @router.get(

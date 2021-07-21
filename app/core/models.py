@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime, Integer, inspect
 class ModelMixin(object):
     id = Column(Integer, primary_key=True)
 
-    def to_dict(self):
+    def dict(self):
         """Return a dictionary representation of this model."""
         data = {}
 

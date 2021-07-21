@@ -44,11 +44,19 @@ async def get_current_user(
 async def get_current_user_verified(
     current_user: User = Depends(get_current_user),
 ):
-    settings = get_settings()
+    if current_user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Email not verified"
+        )
+    return current_user
 
-    if (
-        settings.ACCOUNT_EMAIL_VERIFY_ENABLE
-        and current_user.email_verified_at is None
-    ):
-        raise HTTPException(status_code=403, detail="Email not verified")
+
+async def get_current_user_verified_admin(
+    current_user: User = Depends(get_current_user_verified),
+):
+
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
+        )
     return current_user

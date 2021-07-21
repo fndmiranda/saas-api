@@ -52,7 +52,7 @@ flake8:
 	@flake8 --show-source app tests alembic
 
 check-import:
-	@isort app tests alembic --check-only
+	@isort app tests alembic --multi-line=3 --trailing-comma --force-grid-wrap=0 --use-parentheses --check-only
 
 fix-import:
 	isort app tests alembic --multi-line=3 --trailing-comma --force-grid-wrap=0 --use-parentheses
