@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Optional, List, Literal
+from typing import List, Literal, Optional
 
 from pydantic import Field
 
-from app.core.schemas import SchemaBase, PhoneSchema, PaginationSchema
 from app.address.schemas import AddressCreate
+from app.core.schemas import PaginationSchema, PhoneSchema, SchemaBase
 
 
 class SegmentBase(SchemaBase):

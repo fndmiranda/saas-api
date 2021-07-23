@@ -1,19 +1,9 @@
-from sqlalchemy import and_
-from sqlalchemy import Column
-from sqlalchemy import create_engine
-from sqlalchemy import event
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import foreign
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import remote
-from sqlalchemy.orm import Session
-from app.core.models import ModelMixin, TimestampMixin
-from app.database import Base
 import sqlalchemy as sa
+from sqlalchemy import and_, event
+from sqlalchemy.orm import backref, foreign, relationship, remote
+
+from app.core.models import ModelMixin
+from app.database import Base
 
 
 class Address(Base, ModelMixin):
@@ -23,6 +13,7 @@ class Address(Base, ModelMixin):
     single table.
 
     """
+
     __tablename__ = "address_addresses"
 
     name = sa.Column(sa.String, nullable=True)
@@ -84,7 +75,8 @@ def setup_listener(mapper, class_):
             "parent_%s" % discriminator,
             primaryjoin=remote(class_.id) == foreign(Address.parent_id),
         ),
-        lazy="subquery", cascade="all, delete"
+        lazy="subquery",
+        cascade="all, delete",
     )
 
     @event.listens_for(class_.addresses, "append")

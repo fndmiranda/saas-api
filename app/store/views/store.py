@@ -5,16 +5,12 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.account.schemas import Account
-from app.auth.depends import (
-    current_user_verified,
-    current_user_admin,
-)
+from app.auth.depends import current_user_verified
 from app.core.depends import common_parameters
-from app.core.schemas import PaginationSchema
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.models import Store as StoreModel
-from app.store.schemas import Store, StoreCreate, StoreUpdate, StorePagination
+from app.store.schemas import Store, StoreCreate, StorePagination, StoreUpdate
 from app.store.services.store import create, delete, get, update
 from app.store.validators import validate_store, validate_store_owner_or_admin
 
@@ -29,7 +25,9 @@ logger = logging.getLogger(__name__)
     status_code=status.HTTP_201_CREATED,
 )
 async def create_store(
-    *, session: AsyncSession = Depends(get_session), store_in: StoreCreate,
+    *,
+    session: AsyncSession = Depends(get_session),
+    store_in: StoreCreate,
     account: Account = Depends(current_user_verified),
 ):
     logger.info(
@@ -153,13 +151,9 @@ async def update_store(
         session=session, store=store, account=account
     )
 
-    await validate_store(
-        session=session, store_in=store_in, store=store
-    )
+    await validate_store(session=session, store_in=store_in, store=store)
 
-    store = await update(
-        session=session, store_in=store_in, store=store
-    )
+    store = await update(session=session, store_in=store_in, store=store)
     logger.info(
         "Store updated successfully with={}".format(
             {
@@ -181,9 +175,7 @@ async def delete_store(
     store_id: int,
     account: Account = Depends(current_user_verified),
 ):
-    logger.info(
-        "Starting delete store with={}".format({"store_id": store_id})
-    )
+    logger.info("Starting delete store with={}".format({"store_id": store_id}))
 
     store = await get(session=session, store_id=store_id)
 

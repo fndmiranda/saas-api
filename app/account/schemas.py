@@ -1,7 +1,9 @@
 from datetime import date, datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
+
+from app.address.schemas import AddressCreate
 
 
 class UserBase(BaseModel):
@@ -47,6 +49,7 @@ class AccountBase(UserBase):
 
 class AccountCreate(AccountBase):
     password: str
+    addresses: Optional[List[AddressCreate]]
 
 
 class AccountUpdate(AccountBase):

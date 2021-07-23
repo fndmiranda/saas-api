@@ -24,7 +24,7 @@ class Store(
     Base,
     ModelMixin,
     TimestampMixin,
-    HasAddresses
+    HasAddresses,
 ):
     __tablename__ = "store_stores"
 
@@ -43,8 +43,10 @@ class Store(
     segment = relationship("Segment", back_populates="stores")
     segment_id = sa.Column(sa.Integer, sa.ForeignKey("store_segments.id"))
     people = relationship(
-        "StorePerson", back_populates="store",
-        lazy="dynamic", cascade="all, delete"
+        "StorePerson",
+        back_populates="store",
+        lazy="dynamic",
+        cascade="all, delete",
     )
 
 

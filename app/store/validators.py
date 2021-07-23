@@ -1,13 +1,12 @@
-import pprint
-
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.account.schemas import Account
-from app.store.models import Segment as SegmentModel, Store as StoreModel, \
-    StorePerson
+from app.store.models import Segment as SegmentModel
+from app.store.models import Store as StoreModel
+from app.store.models import StorePerson
 from app.store.schemas import Segment, Store
 
 
@@ -93,8 +92,10 @@ async def validate_store_owner_or_admin(
     *, session: AsyncSession, account: Account, store: Store
 ):
     stmt = select(StorePerson).where(
-        StorePerson.user_id == account.id, StorePerson.store_id == store.id,
-        StorePerson.is_owner, StorePerson.is_active
+        StorePerson.user_id == account.id,
+        StorePerson.store_id == store.id,
+        StorePerson.is_owner,
+        StorePerson.is_active,
     )
     query = await session.execute(stmt.with_only_columns(func.count()))
     await session.commit()

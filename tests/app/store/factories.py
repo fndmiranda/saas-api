@@ -22,11 +22,11 @@ class StoreFactory(BaseFactory):
     class Meta:
         model = Store
 
-    title = factory.Sequence(lambda n: 'The store title %d' % n)
-    legal = factory.Sequence(lambda n: 'The store legal %d' % n)
+    title = factory.Sequence(lambda n: "The store title %d" % n)
+    legal = factory.Sequence(lambda n: "The store legal %d" % n)
     phones = [{"default": True, "name": "Principal", "number": "34999925530"}]
     information = {
-        "summary": 'The store summary',
+        "summary": "The store summary",
         "mon_time": [{"start": "18:00", "end": "22:00"}],
         "tue_time": [
             {"start": "07:00", "end": "11:00"},
@@ -44,9 +44,11 @@ class StoreFactory(BaseFactory):
     is_active = True
     document_type = "cpf"
     document_number = factory.Sequence(
-        lambda n: 'store_document_number_%d' % n)
+        lambda n: "store_document_number_%d" % n
+    )
     approved_at = None
     # segment = factory.SubFactory(SegmentFactory)
-    image = factory.Sequence(lambda n: 'image_url_%d.jpg' % n)
+    image = factory.Sequence(lambda n: "image_url_%d.jpg" % n)
     background_image = factory.Sequence(
-        lambda n: 'background_image_url_%d.jpg' % n)
+        lambda n: "background_image_url_%d.jpg" % n
+    )

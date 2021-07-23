@@ -43,9 +43,7 @@ async def create_account(
     summary="Get account.",
     response_model=Account,
 )
-async def get_account(
-    *, account_in: Account = Depends(current_user_verified)
-):
+async def get_account(*, account_in: Account = Depends(current_user_verified)):
     logger.info(
         "Response of get user account with={}".format(
             {"user_id": account_in.id}

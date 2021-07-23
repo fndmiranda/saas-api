@@ -6,13 +6,13 @@ from fastapi import status
 from httpx import AsyncClient
 
 from app.auth.services import create_access_token
+from app.database import async_session
 from app.main import api_router
 from app.store.models import StorePerson
+from app.store.services.store import get
 from tests.app.address.factories import AddressFactory
 from tests.app.store.factories import SegmentFactory, StoreFactory
 from tests.app.user.factories import UserFactory
-from app.store.services.store import get
-from app.database import async_session
 
 
 @pytest.mark.asyncio
@@ -39,7 +39,8 @@ async def test_store_view_should_create_store_without_addresses(
     }
 
     response = await client.post(
-        api_router.url_path_for("create_store"), json=data,
+        api_router.url_path_for("create_store"),
+        json=data,
         headers={"Authorization": f"Bearer {token['access_token']}"},
     )
 
@@ -47,14 +48,15 @@ async def test_store_view_should_create_store_without_addresses(
         assert response.status_code == status.HTTP_201_CREATED
 
         async with async_session() as session:
-            store = await get(
-                session=session, store_id=response.json()["id"]
-            )
+            store = await get(session=session, store_id=response.json()["id"])
 
-            query = await session.execute(store.people.where(
-                StorePerson.is_owner, StorePerson.is_active,
-                StorePerson.user_id == user.id,
-            ))
+            query = await session.execute(
+                store.people.where(
+                    StorePerson.is_owner,
+                    StorePerson.is_active,
+                    StorePerson.user_id == user.id,
+                )
+            )
             person = query.scalar_one_or_none()
             await session.commit()
 
@@ -65,7 +67,7 @@ async def test_store_view_should_create_store_without_addresses(
 
 @pytest.mark.asyncio
 async def test_store_view_should_create_store_with_addresses(
-    client: AsyncClient
+    client: AsyncClient,
 ):
     """Test store view should create store with addresses."""
     segment = await SegmentFactory.create()
@@ -84,23 +86,26 @@ async def test_store_view_should_create_store_with_addresses(
         "document_type": build.document_type,
         "document_number": build.document_number,
         "segment_id": segment.id,
-        "addresses": [{
-            "name": address.name,
-            "is_default": address.is_default,
-            "street": address.street,
-            "neighborhood": address.neighborhood,
-            "city": address.city,
-            "postcode": address.postcode,
-            "state": address.state,
-            "number": address.number,
-            "complement": address.complement,
-            "lat": address.lat,
-            "lng": address.lng,
-        }],
+        "addresses": [
+            {
+                "name": address.name,
+                "is_default": address.is_default,
+                "street": address.street,
+                "neighborhood": address.neighborhood,
+                "city": address.city,
+                "postcode": address.postcode,
+                "state": address.state,
+                "number": address.number,
+                "complement": address.complement,
+                "lat": address.lat,
+                "lng": address.lng,
+            }
+        ],
     }
 
     response = await client.post(
-        api_router.url_path_for("create_store"), json=data,
+        api_router.url_path_for("create_store"),
+        json=data,
         headers={"Authorization": f"Bearer {token['access_token']}"},
     )
 
@@ -130,7 +135,8 @@ async def test_store_view_not_should_create_duplicate_store(
     }
 
     response = await client.post(
-        api_router.url_path_for("create_store"), json=data,
+        api_router.url_path_for("create_store"),
+        json=data,
         headers={"Authorization": f"Bearer {token['access_token']}"},
     )
 

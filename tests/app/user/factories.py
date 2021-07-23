@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 import factory
 
@@ -14,7 +14,7 @@ class UserFactory(BaseFactory):
     nickname = factory.Sequence(lambda n: "nickname_%d" % n)
     document_number = factory.Faker("cpf")
     phones = [{"default": True, "name": "Principal", "number": 34999925530}]
-    birthdate = datetime.now()
+    birthdate = date.today()
     accept_legal_term = True
     is_admin = False
     is_celebrity = False

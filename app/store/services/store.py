@@ -1,4 +1,3 @@
-import pprint
 from typing import Optional
 
 from fastapi.encoders import jsonable_encoder
@@ -21,11 +20,14 @@ async def create(
     create_data = store_in.dict()
 
     if create_data.get("addresses"):
-        create_data.update({
-            "addresses": [
-                Address(**address) for address in create_data.get("addresses")
-            ]
-        })
+        create_data.update(
+            {
+                "addresses": [
+                    Address(**address)
+                    for address in create_data.get("addresses")
+                ]
+            }
+        )
     else:
         create_data.pop("addresses")
 

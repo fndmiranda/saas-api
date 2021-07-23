@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, FastAPI
 
-from app.account.views import router as account_router
+from app.account.routers import router as account_router
 from app.auth.views import router as oauth_router
 from app.core.views import router as core_router
 from app.store.routers import router as store_router

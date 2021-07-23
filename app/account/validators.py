@@ -13,9 +13,7 @@ async def validate_account(
     clauses = []
     for field in ["email", "nickname", "document_number"]:
         if getattr(account_in, field) is not None:
-            clauses.append(
-                getattr(User, field) == getattr(account_in, field)
-            )
+            clauses.append(getattr(User, field) == getattr(account_in, field))
 
     if not len(clauses):
         return

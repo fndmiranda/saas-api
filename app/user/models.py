@@ -4,6 +4,7 @@ from hmac import compare_digest as compare_hash
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 
+from app.address.models import HasAddresses
 from app.core.models import ModelMixin, TimestampMixin
 from app.database import Base
 
@@ -12,6 +13,7 @@ class User(
     Base,
     ModelMixin,
     TimestampMixin,
+    HasAddresses,
 ):
     __tablename__ = "user_users"
 

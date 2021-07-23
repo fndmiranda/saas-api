@@ -8,8 +8,10 @@ router = APIRouter()
 
 
 @router.get(
-    "/", summary="Application root.",
-    status_code=status.HTTP_200_OK, response_model=RootSchema,
+    "/",
+    summary="Application root.",
+    status_code=status.HTTP_200_OK,
+    response_model=RootSchema,
 )
 async def root():
     settings = get_settings()

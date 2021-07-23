@@ -4,17 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.depends import (
-    current_user_verified,
-    current_user_admin,
-)
+from app.auth.depends import current_user_admin, current_user_verified
 from app.core.depends import common_parameters
-from app.core.schemas import PaginationSchema
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.models import Segment as SegmentModel
-from app.store.schemas import Segment, SegmentCreate, SegmentUpdate, \
-    SegmentPagination
+from app.store.schemas import (
+    Segment,
+    SegmentCreate,
+    SegmentPagination,
+    SegmentUpdate,
+)
 from app.store.services.segment import create, delete, get, update
 from app.store.validators import validate_segment
 

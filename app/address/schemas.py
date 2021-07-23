@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from app.core.schemas import SchemaBase, PaginationSchema
+from app.core.schemas import PaginationSchema, SchemaBase
 
 
 class AddressBase(SchemaBase):
