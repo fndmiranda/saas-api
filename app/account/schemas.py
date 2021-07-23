@@ -32,13 +32,12 @@ class User(UserBase):
 
 class AccountBase(UserBase):
     name: str = Field(None, min_length=2, max_length=64)
-    email: str
-    nickname: str
-    document_number: str
-    accept_legal_term: bool
-    is_admin: bool = False
-    is_celebrity: bool = False
-    birthdate: date = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    nickname: Optional[str] = None
+    document_number: Optional[str] = None
+    accept_legal_term: Optional[bool] = True
+    birthdate: Optional[date] = None
 
     @validator("accept_legal_term")
     def accept_legal_term(cls, v, values):
@@ -49,11 +48,12 @@ class AccountBase(UserBase):
 
 class AccountCreate(AccountBase):
     password: str
+    nickname: str
     addresses: Optional[List[AddressCreate]]
 
 
 class AccountUpdate(AccountBase):
-    password: Optional[str] = None
+    pass
 
 
 class Account(AccountBase):
@@ -61,6 +61,8 @@ class Account(AccountBase):
     created_at: datetime = datetime.utcnow()
     updated_at: datetime = datetime.utcnow()
     email_verified_at: datetime = None
+    is_admin: bool = False
+    is_celebrity: bool = False
 
     class Config:
         orm_mode = True

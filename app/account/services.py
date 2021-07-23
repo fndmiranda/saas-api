@@ -37,6 +37,7 @@ async def create(
     instance = User(**create_data)
     session.add(instance)
     await session.commit()
+
     return instance
 
 

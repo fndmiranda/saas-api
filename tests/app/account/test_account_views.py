@@ -83,6 +83,32 @@ async def test_account_view_should_create_account_with_addresses(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("accept_legal_term", [False, True])
+async def test_account_view_should_create_simple_account(
+    client: AsyncClient, accept_legal_term
+):
+    """Test account view should create simple account."""
+    build = await UserFactory.build()
+    data = {
+        "name": build.name,
+        "email": build.email,
+        "nickname": build.nickname,
+        "accept_legal_term": accept_legal_term,
+        "password": "testpass",
+    }
+
+    response = await client.post(
+        api_router.url_path_for("create_account"), json=data
+    )
+
+    if accept_legal_term:
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["id"] is not None
+    else:
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
 async def test_account_view_not_should_create_account_duplicate(
     client: AsyncClient,
 ):
