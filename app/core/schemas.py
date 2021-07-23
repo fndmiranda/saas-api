@@ -10,9 +10,15 @@ class SchemaBase(BaseModel):
         arbitrary_types_allowed = True
 
 
-class SchemaPagination(SchemaBase):
+class PaginationSchema(SchemaBase):
     items: List = []
     per_page: int
     num_pages: int
     total: int
     page: int
+
+
+class PhoneSchema(SchemaBase):
+    name: str
+    number: int
+    default: bool

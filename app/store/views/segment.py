@@ -5,11 +5,11 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.depends import (
-    get_current_user_verified,
-    get_current_user_verified_admin,
+    current_user_verified,
+    current_user_admin,
 )
 from app.core.depends import common_parameters
-from app.core.schemas import SchemaPagination
+from app.core.schemas import PaginationSchema
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.models import Segment as SegmentModel
@@ -21,10 +21,41 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+@router.post(
+    "/segments",
+    summary="Create segment.",
+    response_model=Segment,
+    dependencies=[Depends(current_user_admin)],
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_segment(
+    *, session: AsyncSession = Depends(get_session), segment_in: SegmentCreate
+):
+    logger.info(
+        "Starting create segment with={}".format(
+            {
+                "segment_in": segment_in,
+            }
+        )
+    )
+
+    await validate_segment(session=session, segment_in=segment_in)
+
+    segment = await create(session=session, segment_in=segment_in)
+    logger.info(
+        "Segment created successfully with={}".format(
+            {
+                "segment": segment,
+            }
+        )
+    )
+    return segment
+
+
 @router.get(
     "/segments",
     summary="Get segments.",
-    response_model=SchemaPagination,
+    response_model=PaginationSchema,
 )
 async def get_segments(
     *,
@@ -53,41 +84,10 @@ async def get_segments(
     return pagination
 
 
-@router.post(
-    "/segments",
-    summary="Create segment.",
-    response_model=Segment,
-    dependencies=[Depends(get_current_user_verified_admin)],
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_segment(
-    *, session: AsyncSession = Depends(get_session), segment_in: SegmentCreate
-):
-    logger.info(
-        "Starting create segment with={}".format(
-            {
-                "segment_in": segment_in,
-            }
-        )
-    )
-
-    await validate_segment(session=session, segment_in=segment_in)
-
-    segment = await create(session=session, segment_in=segment_in)
-    logger.info(
-        "Segment created successfully with={}".format(
-            {
-                "segment": segment,
-            }
-        )
-    )
-    return segment
-
-
 @router.get(
     "/segments/{segment_id}",
     summary="Get segment.",
-    dependencies=[Depends(get_current_user_verified)],
+    dependencies=[Depends(current_user_verified)],
     response_model=Segment,
 )
 async def get_segment(
@@ -123,7 +123,7 @@ async def get_segment(
     "/segments/{segment_id}",
     summary="Update segment.",
     response_model=Segment,
-    dependencies=[Depends(get_current_user_verified_admin)],
+    dependencies=[Depends(current_user_admin)],
 )
 async def update_segment(
     *,
@@ -167,7 +167,7 @@ async def update_segment(
 @router.delete(
     "/segments/{segment_id}",
     summary="Delete segment.",
-    dependencies=[Depends(get_current_user_verified_admin)],
+    dependencies=[Depends(current_user_admin)],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_segment(

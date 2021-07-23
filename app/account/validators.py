@@ -10,11 +10,15 @@ from app.user.models import User
 async def validate_account(
     *, session: AsyncSession, account_in: Account, account: Account = None
 ):
-    clauses = (
-        User.email == account_in.email,
-        User.nickname == account_in.nickname,
-        User.document_number == account_in.document_number,
-    )
+    clauses = []
+    for field in ["email", "nickname", "document_number"]:
+        if getattr(account_in, field) is not None:
+            clauses.append(
+                getattr(User, field) == getattr(account_in, field)
+            )
+
+    if not len(clauses):
+        return
 
     stmt = select(User).where(or_(*clauses))
 

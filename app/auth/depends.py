@@ -11,7 +11,7 @@ from app.user.models import User
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_current_user(
+async def current_user(
     token: str = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_session),
 ):
@@ -41,8 +41,8 @@ async def get_current_user(
     return user
 
 
-async def get_current_user_verified(
-    current_user: User = Depends(get_current_user),
+async def current_user_verified(
+    current_user: User = Depends(current_user),
 ):
     if current_user.email_verified_at is None:
         raise HTTPException(
@@ -51,8 +51,8 @@ async def get_current_user_verified(
     return current_user
 
 
-async def get_current_user_verified_admin(
-    current_user: User = Depends(get_current_user_verified),
+async def current_user_admin(
+    current_user: User = Depends(current_user_verified),
 ):
 
     if not current_user.is_admin:

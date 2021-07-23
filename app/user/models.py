@@ -2,6 +2,7 @@ import crypt
 from hmac import compare_digest as compare_hash
 
 import sqlalchemy as sa
+from sqlalchemy.orm import relationship
 
 from app.core.models import ModelMixin, TimestampMixin
 from app.database import Base
@@ -28,6 +29,9 @@ class User(
     accept_legal_term = sa.Column(sa.Boolean(), nullable=False, default=False)
     email_verified_at = sa.Column(sa.DateTime, nullable=True)
     salt = sa.Column(sa.String(128), nullable=False)
+    stores = relationship(
+        "StorePerson", back_populates="user", cascade="all, delete"
+    )
 
     # define password getter
     @property

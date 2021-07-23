@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.account import services
 from app.account.schemas import Account, AccountCreate, AccountUpdate
 from app.account.validators import validate_account
-from app.auth.depends import get_current_user_verified
+from app.auth.depends import current_user_verified
 from app.depends import get_session
 
 router = APIRouter()
@@ -44,7 +44,7 @@ async def create_account(
     response_model=Account,
 )
 async def get_account(
-    *, account_in: Account = Depends(get_current_user_verified)
+    *, account_in: Account = Depends(current_user_verified)
 ):
     logger.info(
         "Response of get user account with={}".format(
@@ -62,7 +62,7 @@ async def get_account(
 async def update_account(
     *,
     session: AsyncSession = Depends(get_session),
-    account: Account = Depends(get_current_user_verified),
+    account: Account = Depends(current_user_verified),
     account_in: AccountUpdate
 ):
     await validate_account(
@@ -90,7 +90,7 @@ async def update_account(
 async def delete_account(
     *,
     session: AsyncSession = Depends(get_session),
-    account: Account = Depends(get_current_user_verified)
+    account: Account = Depends(current_user_verified)
 ):
     await services.delete(session=session, account=account)
 

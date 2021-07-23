@@ -45,6 +45,7 @@ async def search_filter_sort_paginate(
     )
 
     query = await session.execute(stmt)
+    await session.commit()
 
     return {
         "items": query.scalars().all(),
