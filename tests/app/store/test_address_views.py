@@ -134,123 +134,155 @@ async def test_store_view_should_get_addresses(client: AsyncClient):
     assert response.json()["total"] == len(addresses)
 
 
-# @pytest.mark.asyncio
-# @pytest.mark.parametrize("email_verified_at", [None, datetime.now()])
-# async def test_store_view_should_get_store(
-#     client: AsyncClient, email_verified_at
-# ):
-#     """Test store view should get store."""
-#     user = await UserFactory.create(email_verified_at=email_verified_at)
-#     token = await create_access_token(user=user)
-#
-#     store = await StoreFactory.create()
-#
-#     response = await client.get(
-#         api_router.url_path_for("get_store", store_id=store.id),
-#         headers={"Authorization": f"Bearer {token['access_token']}"},
-#     )
-#
-#     if email_verified_at is not None:
-#         assert response.status_code == status.HTTP_200_OK
-#     else:
-#         assert response.status_code == status.HTTP_403_FORBIDDEN
-#
-#
-# @pytest.mark.asyncio
-# @pytest.mark.parametrize("email_verified_at", [None, datetime.now()])
-# async def test_store_view_should_update_store(
-#     client: AsyncClient, email_verified_at
-# ):
-#     """Test store view should update store by owner."""
-#     user = await UserFactory.create(email_verified_at=email_verified_at)
-#     token = await create_access_token(user=user)
-#
-#     store = await StoreFactory.create(
-#         people=[StorePerson(is_owner=True, user=user)]
-#     )
-#     build = await StoreFactory.build()
-#     data = {
-#         "title": build.title,
-#         "legal": build.legal,
-#         "phones": build.phones,
-#         "information": build.information,
-#         "is_active": build.is_active,
-#         "document_type": build.document_type,
-#         "document_number": build.document_number,
-#     }
-#
-#     response = await client.put(
-#         api_router.url_path_for("update_store", store_id=store.id),
-#         headers={"Authorization": f"Bearer {token['access_token']}"},
-#         json=data,
-#     )
-#
-#     if email_verified_at is not None:
-#         assert response.status_code == status.HTTP_200_OK
-#     else:
-#         assert response.status_code == status.HTTP_403_FORBIDDEN
-#
-#
-# @pytest.mark.asyncio
-# @pytest.mark.parametrize("is_admin", [False, True])
-# async def test_store_view_should_admin_update_store(
-#     client: AsyncClient, is_admin
-# ):
-#     """Test store view should update store by admin."""
-#     user = await UserFactory.create(is_admin=is_admin)
-#     token = await create_access_token(user=user)
-#
-#     owner = await UserFactory.create()
-#     store = await StoreFactory.create(
-#         people=[StorePerson(is_owner=True, user=owner)]
-#     )
-#     build = await StoreFactory.build()
-#     data = {
-#         "title": build.title,
-#         "legal": build.legal,
-#         "phones": build.phones,
-#         "information": build.information,
-#         "is_active": build.is_active,
-#         "document_type": build.document_type,
-#         "document_number": build.document_number,
-#     }
-#
-#     response = await client.put(
-#         api_router.url_path_for("update_store", store_id=store.id),
-#         headers={"Authorization": f"Bearer {token['access_token']}"},
-#         json=data,
-#     )
-#
-#     if is_admin:
-#         assert response.status_code == status.HTTP_200_OK
-#     else:
-#         assert response.status_code == status.HTTP_403_FORBIDDEN
-#
-#
-# @pytest.mark.asyncio
-# @pytest.mark.parametrize("email_verified_at", [None, datetime.now()])
-# async def test_store_view_should_delete_store(
-#     client: AsyncClient, email_verified_at
-# ):
-#     """Test store view should delete store by owner."""
-#     user = await UserFactory.create(email_verified_at=email_verified_at)
-#     token = await create_access_token(user=user)
-#
-#     store = await StoreFactory.create(
-#         people=[StorePerson(is_owner=True, user=user)]
-#     )
-#
-#     response = await client.delete(
-#         api_router.url_path_for("delete_store", store_id=store.id),
-#         headers={"Authorization": f"Bearer {token['access_token']}"},
-#     )
-#
-#     if email_verified_at is not None:
-#         assert response.status_code == status.HTTP_204_NO_CONTENT
-#     else:
-#         assert response.status_code == status.HTTP_403_FORBIDDEN
-#
-#
+@pytest.mark.asyncio
+@pytest.mark.parametrize("email_verified_at", [None, datetime.now()])
+async def test_store_view_should_get_address(
+    client: AsyncClient, email_verified_at
+):
+    """Test store view should get address."""
+    owner = await UserFactory.create()
+    user = await UserFactory.create(email_verified_at=email_verified_at)
+    token = await create_access_token(user=user)
+
+    store = await StoreFactory.create(
+        people=[StorePerson(is_owner=True, user=owner)]
+    )
+    address = await AddressFactory.create(
+        parent_id=store.id, discriminator=store.__class__.__name__.lower(),
+    )
+
+    response = await client.get(
+        api_router.url_path_for(
+            "get_store_address", address_id=address.id, store_id=store.id
+        ),
+        headers={"Authorization": f"Bearer {token['access_token']}"},
+    )
+
+    if email_verified_at is not None:
+        assert response.status_code == status.HTTP_200_OK
+    else:
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("email_verified_at", [None, datetime.now()])
+async def test_store_view_should_update_address(
+    client: AsyncClient, email_verified_at
+):
+    """Test store view should update store by owner."""
+    user = await UserFactory.create(email_verified_at=email_verified_at)
+    token = await create_access_token(user=user)
+
+    store = await StoreFactory.create(
+        people=[StorePerson(is_owner=True, user=user)]
+    )
+    address = await AddressFactory.create(
+        parent_id=store.id, discriminator=store.__class__.__name__.lower(),
+    )
+
+    build = await AddressFactory.build()
+    data = {
+        "name": build.name,
+        "is_default": build.is_default,
+        "street": build.street,
+        "neighborhood": build.neighborhood,
+        "city": build.city,
+        "postcode": build.postcode,
+        "state": build.state,
+        "number": build.number,
+        "complement": build.complement,
+        "lat": build.lat,
+        "lng": build.lng,
+    }
+
+    response = await client.put(
+        api_router.url_path_for(
+            "update_store_address", store_id=store.id, address_id=address.id
+        ),
+        headers={"Authorization": f"Bearer {token['access_token']}"},
+        json=data,
+    )
+
+    if email_verified_at is not None:
+        assert response.status_code == status.HTTP_200_OK
+    else:
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("is_admin", [False, True])
+async def test_store_view_should_admin_update_address(
+    client: AsyncClient, is_admin
+):
+    """Test store view should update store by admin."""
+    owner = await UserFactory.create()
+    user = await UserFactory.create(is_admin=is_admin)
+    token = await create_access_token(user=user)
+
+    store = await StoreFactory.create(
+        people=[StorePerson(is_owner=True, user=owner)]
+    )
+    address = await AddressFactory.create(
+        parent_id=store.id, discriminator=store.__class__.__name__.lower(),
+    )
+
+    build = await AddressFactory.build()
+    data = {
+        "name": build.name,
+        "is_default": build.is_default,
+        "street": build.street,
+        "neighborhood": build.neighborhood,
+        "city": build.city,
+        "postcode": build.postcode,
+        "state": build.state,
+        "number": build.number,
+        "complement": build.complement,
+        "lat": build.lat,
+        "lng": build.lng,
+    }
+
+    response = await client.put(
+        api_router.url_path_for(
+            "update_store_address", store_id=store.id, address_id=address.id
+        ),
+        headers={"Authorization": f"Bearer {token['access_token']}"},
+        json=data,
+    )
+
+    if is_admin:
+        assert response.status_code == status.HTTP_200_OK
+    else:
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("email_verified_at", [None, datetime.now()])
+async def test_store_view_should_delete_address(
+    client: AsyncClient, email_verified_at
+):
+    """Test store view should delete address by owner."""
+    user = await UserFactory.create(email_verified_at=email_verified_at)
+    token = await create_access_token(user=user)
+    store = await StoreFactory.create(
+        people=[StorePerson(is_owner=True, user=user)]
+    )
+    address = await AddressFactory.create(
+        parent_id=store.id, discriminator=store.__class__.__name__.lower(),
+    )
+
+    response = await client.delete(
+        api_router.url_path_for(
+            "delete_store_address", store_id=store.id, address_id=address.id
+        ),
+        headers={"Authorization": f"Bearer {token['access_token']}"},
+    )
+
+    if email_verified_at is not None:
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+    else:
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
 # @pytest.mark.asyncio
 # @pytest.mark.parametrize("is_admin", [True])
 # async def test_store_view_should_admin_delete_store(

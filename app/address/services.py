@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 
 from app.account.schemas import Account
 from app.address.models import Address
-from app.address.schemas import AddressCreate
+from app.address.schemas import AddressCreate, AddressUpdate
 from app.store.models import Store, StorePerson
 from app.store.schemas import StoreCreate, StoreUpdate
 
@@ -31,38 +31,42 @@ async def create(
 
     await session.commit()
     return address
-#
-#
-# async def get(
-#     *,
-#     session: AsyncSession,
-#     store_id: int,
-# ) -> Optional[Store]:
-#     """Get a store by id."""
-#     query = await session.execute(select(Store).filter_by(id=store_id))
-#     store = query.scalar_one_or_none()
-#     await session.commit()
-#
-#     return store
-#
-#
-# async def update(
-#     *, session: AsyncSession, store: Store, store_in: StoreUpdate
-# ):
-#     """Update a store."""
-#     store_data = jsonable_encoder(store)
-#     update_data = store_in.dict(exclude_unset=True)
-#
-#     for field in store_data:
-#         if field in update_data:
-#             setattr(store, field, update_data[field])
-#
-#     await session.commit()
-#
-#     return store
-#
-#
-# async def delete(*, session: AsyncSession, store: Store):
-#     """Delete a store."""
-#     await session.delete(store)
-#     await session.commit()
+
+
+async def get(
+    *,
+    session: AsyncSession,
+    address_id: int,
+    parent: BaseModel,
+) -> Optional[Store]:
+    """Get a address by id and parent."""
+    query = await session.execute(select(Address).filter_by(
+        id=address_id, parent_id=parent.id,
+        discriminator=parent.__class__.__name__.lower()
+    ))
+    address = query.scalar_one_or_none()
+    await session.commit()
+
+    return address
+
+
+async def update(
+    *, session: AsyncSession, address: Address, address_in: AddressUpdate
+):
+    """Update a address."""
+    store_data = jsonable_encoder(address)
+    update_data = address_in.dict(exclude_unset=True)
+
+    for field in store_data:
+        if field in update_data:
+            setattr(address, field, update_data[field])
+
+    await session.commit()
+
+    return address
+
+
+async def delete(*, session: AsyncSession, address: Address):
+    """Delete a address."""
+    await session.delete(address)
+    await session.commit()

@@ -14,7 +14,7 @@ from app.core.schemas import PaginationSchema
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.models import Store as StoreModel
-from app.store.schemas import Store, StoreCreate, StoreUpdate
+from app.store.schemas import Store, StoreCreate, StoreUpdate, StorePagination
 from app.store.services.store import create, delete, get, update
 from app.store.validators import validate_store, validate_store_owner_or_admin
 
@@ -58,7 +58,7 @@ async def create_store(
 @router.get(
     "/stores",
     summary="Get stores.",
-    response_model=PaginationSchema,
+    response_model=StorePagination,
 )
 async def get_stores(
     *,

@@ -24,6 +24,5 @@ async def test_core_view_should_root(client: AsyncClient):
     response = await client.get(api_router.url_path_for("root"))
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "application": f"{get_settings().APP_NAME} - {__version__}"
-    }
+    assert response.json()["application"] == get_settings().APP_NAME
+    assert response.json()["version"] == __version__

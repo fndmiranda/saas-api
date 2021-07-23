@@ -3,6 +3,11 @@ from typing import List
 from pydantic import BaseModel
 
 
+class RootSchema(BaseModel):
+    application: str
+    version: str
+
+
 class SchemaBase(BaseModel):
     class Config:
         orm_mode = True

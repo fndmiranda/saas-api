@@ -3,7 +3,7 @@ from typing import Optional, List, Literal
 
 from pydantic import Field
 
-from app.core.schemas import SchemaBase, PhoneSchema
+from app.core.schemas import SchemaBase, PhoneSchema, PaginationSchema
 from app.address.schemas import AddressCreate
 
 
@@ -29,6 +29,10 @@ class Segment(SegmentBase):
 
     class Config:
         orm_mode = True
+
+
+class SegmentPagination(PaginationSchema):
+    items: List[Segment]
 
 
 class StoreBase(SchemaBase):
@@ -67,3 +71,7 @@ class Store(StoreBase):
 
     class Config:
         orm_mode = True
+
+
+class StorePagination(PaginationSchema):
+    items: List[Store]

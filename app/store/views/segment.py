@@ -13,7 +13,8 @@ from app.core.schemas import PaginationSchema
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.models import Segment as SegmentModel
-from app.store.schemas import Segment, SegmentCreate, SegmentUpdate
+from app.store.schemas import Segment, SegmentCreate, SegmentUpdate, \
+    SegmentPagination
 from app.store.services.segment import create, delete, get, update
 from app.store.validators import validate_segment
 
@@ -55,7 +56,7 @@ async def create_segment(
 @router.get(
     "/segments",
     summary="Get segments.",
-    response_model=PaginationSchema,
+    response_model=SegmentPagination,
 )
 async def get_segments(
     *,
