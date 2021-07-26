@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.account import services
+from app.account.services.account import create
 from app.account.schemas import AccountCreate
 from app.database import async_session
 from app.main import api_router
@@ -15,7 +15,7 @@ async def test_oauth_view_should_create_token(
     """Test oauth view should create token."""
 
     async with async_session() as session:
-        await services.create(
+        await create(
             session=session, account_in=AccountCreate(**account_primary)
         )
 
@@ -41,7 +41,7 @@ async def test_oauth_view_not_should_create_token(
     """Test oauth view not should create token."""
 
     async with async_session() as session:
-        await services.create(
+        await create(
             session=session, account_in=AccountCreate(**account_primary)
         )
 

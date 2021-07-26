@@ -9,3 +9,8 @@ typer[all]==0.3.2
 python-multipart==0.0.5
 python-jose[cryptography]==3.3.0
 tabulate==0.8.9
+aiofiles==0.7.0
+Jinja2==3.0.1
+celery==5.1.2
+flower==1.0.0
+redis==3.5.3

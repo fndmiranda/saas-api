@@ -1,10 +1,10 @@
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.account import services
+from app.account.services.account import create, update, delete
 from app.account.schemas import Account, AccountCreate, AccountUpdate
 from app.account.validators import validate_account
 from app.auth.depends import current_user_verified
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
     "/accounts",
     summary="Create account.",
     response_model=Account,
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_account(
     *, session: AsyncSession = Depends(get_session), account_in: AccountCreate
@@ -27,7 +27,7 @@ async def create_account(
 
     await validate_account(session=session, account_in=account_in)
 
-    account = await services.create(session=session, account_in=account_in)
+    account = await create(session=session, account_in=account_in)
     logger.info(
         "User account created successfully with={}".format(
             {
@@ -67,7 +67,7 @@ async def update_account(
         session=session, account_in=account_in, account=account
     )
 
-    await services.update(
+    await update(
         session=session, account=account, account_in=account_in
     )
 
@@ -83,13 +83,13 @@ async def update_account(
 @router.delete(
     "/accounts",
     summary="Delete account.",
-    status_code=204,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_account(
     *,
     session: AsyncSession = Depends(get_session),
     account: Account = Depends(current_user_verified)
 ):
-    await services.delete(session=session, account=account)
+    await delete(session=session, account=account)
 
-    return JSONResponse(status_code=204)
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)

@@ -1,4 +1,5 @@
 import crypt
+from datetime import datetime
 from hmac import compare_digest as compare_hash
 
 import sqlalchemy as sa
@@ -48,3 +49,12 @@ class User(
 
     def check_password(self, password):
         return compare_hash(crypt.crypt(password, self.salt), self.password)
+
+
+class PasswordReset(Base, ModelMixin,):
+    __tablename__ = "user_password_resets"
+
+    email = sa.Column(sa.String(), nullable=False, index=True)
+    token = sa.Column(sa.String(), nullable=False)
+    created_at = sa.Column(sa.DateTime, default=datetime.now)
+    expire_at = sa.Column(sa.DateTime, nullable=False)

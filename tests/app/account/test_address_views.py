@@ -5,7 +5,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.account.services import get
+from app.account.services.account import get
 from app.auth.services import create_access_token
 from app.database import async_session
 from app.main import api_router

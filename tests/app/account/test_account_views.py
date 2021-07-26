@@ -4,7 +4,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.account import services
+from app.account.services.account import create
 from app.account.schemas import AccountCreate
 from app.auth.services import create_access_token
 from app.database import async_session
@@ -125,7 +125,7 @@ async def test_account_view_not_should_create_account_duplicate(
     }
 
     async with async_session() as session:
-        await services.create(
+        await create(
             session=session, account_in=AccountCreate(**data)
         )
 

@@ -6,6 +6,8 @@ from app.account.routers import router as account_router
 from app.auth.views import router as oauth_router
 from app.core.views import router as core_router
 from app.store.routers import router as store_router
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from app.version import __version__
 
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +18,8 @@ app = FastAPI(
     version=__version__,
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 api_router = APIRouter()
 api_router.include_router(core_router, tags=["core"])

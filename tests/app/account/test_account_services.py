@@ -1,9 +1,18 @@
-import pytest
+import pprint
 
-from app.account import services
+import pytest
+from fastapi import status, Request
+
+from app.account.services.account import create, update
 from app.account.schemas import Account, AccountCreate, AccountUpdate
+from app.account.services.password import send_mail_reset_password, \
+    generate_password_reset_url
 from app.auth.services import authenticate_user
 from app.database import async_session
+from httpx import AsyncClient
+
+from tests.app.user.factories import UserFactory
+from tests.utils import vcr
 
 
 @pytest.mark.asyncio
@@ -11,7 +20,7 @@ async def test_account_service_should_create(app, account_primary):
     """Test account service should create."""
 
     async with async_session() as session:
-        account = await services.create(
+        account = await create(
             session=session, account_in=AccountCreate(**account_primary)
         )
 
@@ -25,13 +34,13 @@ async def test_account_service_not_should_create_duplicated(
     """Test account service not should create duplicated."""
 
     async with async_session() as session:
-        await services.create(
+        await create(
             session=session, account_in=AccountCreate(**account_primary)
         )
 
     with pytest.raises(Exception):
         async with async_session() as session:
-            await services.create(
+            await create(
                 session=session, account_in=AccountCreate(**account_primary)
             )
 
@@ -43,7 +52,7 @@ async def test_account_service_should_update(
     """Test account service should update."""
 
     async with async_session() as session:
-        account = await services.create(
+        account = await create(
             session=session, account_in=AccountCreate(**account_primary)
         )
 
@@ -51,7 +60,7 @@ async def test_account_service_should_update(
     data_update = schema_update.dict()
 
     async with async_session() as session:
-        instance = await services.update(
+        instance = await update(
             session=session, account=account, account_in=schema_update
         )
 
@@ -70,3 +79,19 @@ async def test_account_service_should_update(
             password=password,
         )
     assert user.id is not None
+
+
+@pytest.mark.asyncio
+@vcr.use_cassette()
+async def test_account_service_should_send_mail_reset_password(
+        client: AsyncClient
+):
+    """Test account service should send mail reset password."""
+
+    user = await UserFactory.create()
+
+    response = await send_mail_reset_password(
+        account_id=user.id, name=user.name, email=user.email, url="testing_url"
+    )
+
+    assert response.status_code == status.HTTP_202_ACCEPTED

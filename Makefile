@@ -22,6 +22,12 @@ runserver-dev:
 runserver:
 	@uvicorn app.main:app
 
+runcelery-dev:
+	@celery -A app.worker.celery worker -E -B --loglevel=INFO --pool=prefork
+
+runflower-dev:
+	@celery -A app.worker.celery flower --port=5555
+
 outdated:
 	@pip list --outdated
 

@@ -48,7 +48,18 @@ def upgrade():
         sa.UniqueConstraint("email"),
         sa.UniqueConstraint("nickname"),
     )
+    op.create_table(
+        'user_password_resets',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('email', sa.String(), nullable=False),
+        sa.Column('token', sa.String(), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('expire_at', sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint("email"),
+    )
 
 
 def downgrade():
+    op.drop_table("user_password_resets")
     op.drop_table("user_users")

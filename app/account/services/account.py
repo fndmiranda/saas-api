@@ -54,6 +54,19 @@ async def get(
     return account
 
 
+async def get_by_email(
+    *,
+    session: AsyncSession,
+    email: str,
+) -> Optional[User]:
+    """Get a account by email."""
+    query = await session.execute(select(User).filter_by(email=email))
+    account = query.scalar_one_or_none()
+    await session.commit()
+
+    return account
+
+
 async def update(
     *, session: AsyncSession, account: User, account_in: AccountUpdate
 ):

@@ -10,3 +10,4 @@ safety==1.10.3
 factory-boy==3.2.0
 pytest-cov==2.12.1
 pytest-deadfixtures==2.2.1
+vcrpy==4.1.1
