@@ -75,3 +75,7 @@ class PasswordResetTokenCreate(BaseModel):
 class PasswordResetToken(BaseModel):
     token: str
     email: str
+
+
+class AccountEmailVerify(BaseModel):
+    email_verified_at: datetime

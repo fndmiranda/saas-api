@@ -71,11 +71,13 @@ async def create_password_reset_token(
     "/accounts/password-reset-form",
     summary="Form to reset password to the given token.",
     response_class=HTMLResponse,
+    include_in_schema=False,
 )
 @router.post(
     "/accounts/password-reset-form",
     summary="Reset password to the given token.",
     response_class=HTMLResponse,
+    include_in_schema=False,
 )
 @csrf_protect
 async def password_reset_form(

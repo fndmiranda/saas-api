@@ -49,6 +49,7 @@ test-matching-log:
 
 coverage:
 	@export SQLALCHEMY_DATABASE_URI=$(SQLALCHEMY_DATABASE_URI_TESTING) && \
+	export TESTING=1 && \
 	py.test --cov=app --cov-report=term-missing --cov-fail-under=80 tests/
 
 migration-up:

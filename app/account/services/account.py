@@ -1,5 +1,3 @@
-import pprint
-from datetime import datetime
 from typing import Optional
 
 from fastapi.encoders import jsonable_encoder
@@ -15,7 +13,6 @@ from app.user.models import User
 async def create(
     session: AsyncSession,
     account_in: AccountCreate,
-    email_verified: bool = False,
 ):
     """Create a new user account."""
     create_data = account_in.dict()
@@ -31,9 +28,6 @@ async def create(
         )
     else:
         create_data.pop("addresses")
-
-    if email_verified:
-        create_data.update({"email_verified_at": datetime.now()})
 
     instance = User(**create_data)
     session.add(instance)
@@ -80,12 +74,6 @@ async def update(
             setattr(account, field, update_data[field])
 
     if "password" in update_data and update_data["password"] is not None:
-        pprint.pp("***************")
-        pprint.pp("***************")
-        pprint.pp(account_data)
-        pprint.pp(update_data["password"])
-        pprint.pp("***************")
-        pprint.pp("***************")
         setattr(account, "password", update_data["password"])
 
     await session.commit()

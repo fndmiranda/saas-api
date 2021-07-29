@@ -1,46 +1,23 @@
-from datetime import datetime, timedelta
-from secrets import token_urlsafe
+import hashlib
+from datetime import datetime
+from hmac import compare_digest
 
 import httpx
 from fastapi import Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.logger import logger
-from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
-from app.account.schemas import PasswordResetTokenCreate
+from app.account.schemas import AccountEmailVerify
 from app.config import get_settings
-from app.user.models import PasswordReset, User
+from app.user.models import User
 
 
-async def create_reset(
-    session: AsyncSession,
-    reset_in: PasswordResetTokenCreate,
-):
-    """Create a new account password reset."""
-    create_data = reset_in.dict()
-    settings = get_settings()
-
-    create_data.update(
-        {
-            "token": token_urlsafe(64),
-            "expire_at": datetime.now()
-            + timedelta(minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES),
-        }
-    )
-
-    instance = PasswordReset(**create_data)
-    session.add(instance)
-    await session.commit()
-
-    return instance
-
-
-async def send_mail_reset_password(
+async def send_email_verification(
     *, account_id: int, name: str, email: str, url: str
 ):
     logger.info(
-        "Start send mail to account reset password with={}".format(
+        "Start send mail to verification email account with={}".format(
             {
                 "user_id": account_id,
             }
@@ -51,10 +28,9 @@ async def send_mail_reset_password(
 
     kwargs = {
         "url": url,
-        "template_name": "password_reset_token_email.html",
-        "subject": "Notificação de redefinição de senha",
-        "expire_minutes": settings.PASSWORD_RESET_EXPIRE_MINUTES,
-        "button_title": "Redefinir senha",
+        "template_name": "resend_verify_email.html",
+        "subject": "Check email address",
+        "button_title": "Check email address",
     }
 
     data = await get_payload_send_email(
@@ -74,7 +50,7 @@ async def send_mail_reset_password(
         )
 
         logger.info(
-            "Sent account email password reset token with={}".format(
+            "Sent verification email account with={}".format(
                 {
                     "user_id": account_id,
                 }
@@ -84,22 +60,33 @@ async def send_mail_reset_password(
         return response
 
 
-async def is_valid_token(session: AsyncSession, token: str, email: str):
-    """Check if password reset token is valid."""
-    query = await session.execute(
-        select(PasswordReset)
-        .where(
-            PasswordReset.token == token,
-            PasswordReset.email == email,
-            PasswordReset.expire_at >= datetime.now(),
-        )
-        .with_only_columns(func.count())
-    )
+async def mark_email_as_verified(
+    *, session: AsyncSession, account: User, verify_in: AccountEmailVerify
+):
+    """Mark a account email verified."""
+    account_data = jsonable_encoder(account)
+    update_data = verify_in.dict(exclude_unset=True)
 
-    is_valid = query.scalar_one()
+    for field in account_data:
+        if field in update_data:
+            setattr(account, field, update_data[field])
+
     await session.commit()
 
-    return bool(is_valid)
+    return account
+
+
+async def get_signature(account: User):
+    """Get the signature."""
+    word = "{}-{}".format(
+        account.created_at.timestamp(), account.salt
+    ).encode()
+    return hashlib.sha256(word).hexdigest()
+
+
+async def signature_is_valid(account: User, signature: str):
+    """Determine if the signature is valid."""
+    return compare_digest(await get_signature(account=account), signature)
 
 
 async def get_payload_send_email(name: str, email: str, **kwargs):
@@ -138,24 +125,24 @@ async def get_payload_send_email(name: str, email: str, **kwargs):
     }
 
 
-async def generate_password_reset_url(
-    *, account: User, request: Request, token: str
-):
-    """Generate password reset url."""
+async def generate_verify_email_url(*, account: User, request: Request):
+    """Generate verify email url."""
     logger.info(
-        "Starting generate password reset url with={}".format(
+        "Starting generate email verify url with={}".format(
             {
                 "user_id": account.id,
             }
         )
     )
 
-    url = "{}/?email={}&token={}".format(
-        request.url_for("password_reset_form"), account.email, token
+    url = request.url_for(
+        "email_verify",
+        user_id=account.id,
+        signature=await get_signature(account=account),
     )
 
     logger.info(
-        "Password reset url generated successfully with={}".format(
+        "Verify email url generated successfully with={}".format(
             {
                 "user_id": account.id,
             }

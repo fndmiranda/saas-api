@@ -14,7 +14,6 @@ from tests.utils import vcr
 @pytest.mark.asyncio
 async def test_account_service_should_create(app, account_primary):
     """Test account service should create."""
-
     async with async_session() as session:
         account = await create(
             session=session, account_in=AccountCreate(**account_primary)

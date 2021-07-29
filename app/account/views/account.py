@@ -1,13 +1,16 @@
 import logging
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.account.schemas import Account, AccountCreate, AccountUpdate
 from app.account.services.account import create, delete, update
+from app.account.services.verified import generate_verify_email_url
+from app.account.tasks import send_mail_verification
 from app.account.validators import validate_account
 from app.auth.depends import current_user_verified
+from app.config import get_settings
 from app.depends import get_session
 
 router = APIRouter()
@@ -21,9 +24,13 @@ logger = logging.getLogger(__name__)
     status_code=status.HTTP_201_CREATED,
 )
 async def create_account(
-    *, session: AsyncSession = Depends(get_session), account_in: AccountCreate
+    *,
+    session: AsyncSession = Depends(get_session),
+    account_in: AccountCreate,
+    request: Request
 ):
     logger.info("Starting create user account")
+    settings = get_settings()
 
     await validate_account(session=session, account_in=account_in)
 
@@ -35,6 +42,24 @@ async def create_account(
             }
         )
     )
+
+    if settings.ACCOUNT_EMAIL_VERIFY_ENABLE:
+        url = await generate_verify_email_url(account=account, request=request)
+        task_id = send_mail_verification.delay(
+            account_id=account.id,
+            name=account.name,
+            email=account.email,
+            url=url,
+        )
+        logger.info(
+            "Create task to send email verification with={}".format(
+                {
+                    "user_id": account.id,
+                    "task_id": task_id,
+                }
+            )
+        )
+
     return account
 
 

@@ -6,6 +6,7 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     APP_TITLE = "SaaS Api"
     APP_NAME: str = "saas-api"
+    APP_DESCRIPTION: str = "Core api of the SaaS Api"
     ADMIN_EMAIL: str = "fndmiranda@gmail.com"
     LOG_LEVEL: str = "INFO"
     DEFAULT_ITEMS_PER_PAGE: int = 5

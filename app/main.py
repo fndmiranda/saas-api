@@ -19,8 +19,8 @@ logging.basicConfig(level=logging.INFO)
 settings = get_settings()
 
 app = FastAPI(
-    title="PapitoPet API",
-    description="Core api of the PapitoPet",
+    title=settings.APP_TITLE,
+    description=settings.APP_DESCRIPTION,
     version=__version__,
     middleware=[
         Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY),
