@@ -1,22 +1,22 @@
 import logging
-import pprint
-from datetime import datetime, timedelta
-from secrets import token_urlsafe
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, status, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, Request, status
+from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette_wtf import csrf_protect
 
-from app.account.depends import password_reset_form_parameters
-from app.account.schemas import Account, AccountCreate, AccountUpdate, \
-    PasswordResetTokenCreate, PasswordResetToken, PasswordResetCreate
-from app.account.services.account import get_by_email
-from app.account.services.password import generate_password_reset_url, create_reset
-from app.account.validators import validate_account
-from app.auth.depends import current_user_verified
+from app.account.forms import PasswordResetForm
+from app.account.schemas import AccountUpdate, PasswordResetTokenCreate
+from app.account.services.account import get_by_email, update
+from app.account.services.password import (
+    create_reset,
+    generate_password_reset_url,
+    is_valid_token,
+)
+from app.account.tasks import send_mail_reset_password
 from app.config import get_settings
 from app.depends import get_session
-from app.account.tasks import send_mail_reset_password
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -28,36 +28,29 @@ logger = logging.getLogger(__name__)
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def create_password_reset_token(
-    *, session: AsyncSession = Depends(get_session),
+    *,
+    session: AsyncSession = Depends(get_session),
     request: Request,
-    reset_in: PasswordResetTokenCreate
+    reset_in: PasswordResetTokenCreate,
 ):
     logger.info("Starting create password reset token")
-
-    settings = get_settings()
 
     account = await get_by_email(session=session, email=reset_in.email)
 
     if account:
-        url, token = await generate_password_reset_url(
-            account=account, request=request
-        )
-
-        expire_at = datetime.now() + timedelta(
-            minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES
-        )
-
-        reset_in = PasswordResetCreate(**{
-            "email": account.email,
-            "token": token,
-            "expire_at": expire_at,
-        })
+        reset_in = PasswordResetTokenCreate(**{"email": account.email})
 
         instance = await create_reset(session=session, reset_in=reset_in)
 
+        url = await generate_password_reset_url(
+            account=account, request=request, token=instance.token
+        )
+
         task_id = send_mail_reset_password.delay(
-            account_id=account.id, name=account.name,
-            email=account.email, url=url,
+            account_id=account.id,
+            name=account.name,
+            email=account.email,
+            url=url,
         )
 
         logger.info(
@@ -66,7 +59,7 @@ async def create_password_reset_token(
                     "user_id": account.id,
                     "reset_id": instance.id,
                     "task_id": task_id,
-                    "expire_at": expire_at,
+                    "expire_at": instance.expire_at,
                 }
             )
         )
@@ -77,81 +70,85 @@ async def create_password_reset_token(
 @router.get(
     "/accounts/password-reset-form",
     summary="Form to reset password to the given token.",
+    response_class=HTMLResponse,
 )
+@router.post(
+    "/accounts/password-reset-form",
+    summary="Reset password to the given token.",
+    response_class=HTMLResponse,
+)
+@csrf_protect
 async def password_reset_form(
-    *, session: AsyncSession = Depends(get_session),
-    params: dict = Depends(password_reset_form_parameters),
+    *,
+    session: AsyncSession = Depends(get_session),
+    request: Request,
+    email: str,
+    token: str,
 ):
-    logger.info("Starting password reset")
+    """Form to reset password to the given token."""
+    from app.main import templates
 
-    # account = await get_by_email(session=session, email=reset_in.email)
-    #
-    # if account:
-    #     services.send_password_reset_token(account=account)
-    #
-    #     logger.info(
-    #         "Password reset token created successfully with={}".format(
-    #             {
-    #                 "user_id": account.id,
-    #             }
-    #         )
-    #     )
+    logger.info("Starting show form password reset")
 
-    return JSONResponse(status_code=status.HTTP_200_OK)
+    settings = get_settings()
 
+    is_valid = await is_valid_token(
+        session=session,
+        token=token,
+        email=email,
+    )
 
-# @router.get(
-#     "/accounts",
-#     summary="Get account.",
-#     response_model=Account,
-# )
-# async def get_account(*, account_in: Account = Depends(current_user_verified)):
-#     logger.info(
-#         "Response of get user account with={}".format(
-#             {"user_id": account_in.id}
-#         )
-#     )
-#     return account_in
-#
-#
-# @router.put(
-#     "/accounts",
-#     summary="Update account.",
-#     response_model=Account,
-# )
-# async def update_account(
-#     *,
-#     session: AsyncSession = Depends(get_session),
-#     account: Account = Depends(current_user_verified),
-#     account_in: AccountUpdate
-# ):
-#     await validate_account(
-#         session=session, account_in=account_in, account=account
-#     )
-#
-#     await services.update(
-#         session=session, account=account, account_in=account_in
-#     )
-#
-#     logger.info(
-#         "Response of update user account with={}".format(
-#             {"user_id": account.id}
-#         )
-#     )
-#
-#     return account
-#
-#
-# @router.delete(
-#     "/accounts",
-#     summary="Delete account.",
-#     status_code=204,
-# )
-# async def delete_account(
-#     *,
-#     session: AsyncSession = Depends(get_session),
-#     account: Account = Depends(current_user_verified)
-# ):
-#     await services.delete(session=session, account=account)
-#
-#     return JSONResponse(status_code=204)
+    if is_valid:
+        form = await PasswordResetForm.from_formdata(request)
+        if request.method.lower() == "post":
+            if await form.validate():
+                account = await get_by_email(session=session, email=email)
+
+                account_in = AccountUpdate(**{"password": form.password.data})
+
+                await update(
+                    session=session, account=account, account_in=account_in
+                )
+
+                logger.info(
+                    "Account password updated successfully with={}".format(
+                        {"user_id": account.id}
+                    )
+                )
+
+                return templates.TemplateResponse(
+                    "show_message.html",
+                    {
+                        "request": request,
+                        "datetime": datetime,
+                        "color": "green",
+                        "message": "Password changed successfully!",
+                        "app_title": settings.APP_TITLE,
+                    },
+                )
+            else:
+                for (k, v) in form.errors.items():
+                    form[k].render_kw.update(
+                        {"class": "form-control is-invalid"}
+                    )
+        else:
+            return templates.TemplateResponse(
+                "password_reset_form.html",
+                {
+                    "request": request,
+                    "datetime": datetime,
+                    "form": form,
+                    "app_title": settings.APP_TITLE,
+                },
+            )
+
+    return templates.TemplateResponse(
+        "show_message.html",
+        {
+            "request": request,
+            "datetime": datetime,
+            "color": "red",
+            "message": "Error occurred, please try again later!",
+            "app_title": settings.APP_TITLE,
+        },
+    )

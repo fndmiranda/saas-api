@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.account.services.account import create, update, delete
 from app.account.schemas import Account, AccountCreate, AccountUpdate
+from app.account.services.account import create, delete, update
 from app.account.validators import validate_account
 from app.auth.depends import current_user_verified
 from app.depends import get_session
@@ -67,9 +67,7 @@ async def update_account(
         session=session, account_in=account_in, account=account
     )
 
-    await update(
-        session=session, account=account, account_in=account_in
-    )
+    await update(session=session, account=account, account_in=account_in)
 
     logger.info(
         "Response of update user account with={}".format(

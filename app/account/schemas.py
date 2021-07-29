@@ -68,12 +68,6 @@ class Account(AccountBase):
         orm_mode = True
 
 
-class PasswordResetCreate(BaseModel):
-    token: str
-    email: str
-    expire_at: datetime
-
-
 class PasswordResetTokenCreate(BaseModel):
     email: str
 

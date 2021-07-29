@@ -1,21 +1,35 @@
 import logging
 
 from fastapi import APIRouter, FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.middleware import Middleware
+from starlette.middleware.sessions import SessionMiddleware
+from starlette_wtf import CSRFProtectMiddleware
 
 from app.account.routers import router as account_router
 from app.auth.views import router as oauth_router
+from app.config import get_settings
 from app.core.views import router as core_router
 from app.store.routers import router as store_router
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from app.version import __version__
 
 logging.basicConfig(level=logging.INFO)
+
+settings = get_settings()
 
 app = FastAPI(
     title="PapitoPet API",
     description="Core api of the PapitoPet",
     version=__version__,
+    middleware=[
+        Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY),
+        Middleware(
+            CSRFProtectMiddleware,
+            csrf_secret=settings.CSRF_SECRET,
+            enabled=not settings.TESTING,
+        ),
+    ],
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

@@ -22,10 +22,10 @@ runserver-dev:
 runserver:
 	@uvicorn app.main:app
 
-runcelery-dev:
+runcelery:
 	@celery -A app.worker.celery worker -E -B --loglevel=INFO --pool=prefork
 
-runflower-dev:
+runflower:
 	@celery -A app.worker.celery flower --port=5555
 
 outdated:
@@ -33,15 +33,18 @@ outdated:
 
 test:
 	@export SQLALCHEMY_DATABASE_URI=$(SQLALCHEMY_DATABASE_URI_TESTING) && \
+	export TESTING=1 && \
 	py.test --disable-pytest-warnings
 
 test-matching:
 	@export SQLALCHEMY_DATABASE_URI=$(SQLALCHEMY_DATABASE_URI_TESTING) && \
+	export TESTING=1 && \
 	py.test -sk $(test)
 
 
 test-matching-log:
 	@export SQLALCHEMY_DATABASE_URI=$(SQLALCHEMY_DATABASE_URI_TESTING) && \
+	export TESTING=1 && \
 	py.test -sk $(test) --log-cli-level=INFO
 
 coverage:

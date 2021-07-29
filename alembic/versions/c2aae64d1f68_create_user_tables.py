@@ -49,13 +49,13 @@ def upgrade():
         sa.UniqueConstraint("nickname"),
     )
     op.create_table(
-        'user_password_resets',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('email', sa.String(), nullable=False),
-        sa.Column('token', sa.String(), nullable=False),
-        sa.Column('created_at', sa.DateTime(), nullable=True),
-        sa.Column('expire_at', sa.DateTime(), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
+        "user_password_resets",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("email", sa.String(), nullable=False),
+        sa.Column("token", sa.String(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=True),
+        sa.Column("expire_at", sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
 

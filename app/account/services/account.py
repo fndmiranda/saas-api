@@ -1,3 +1,4 @@
+import pprint
 from datetime import datetime
 from typing import Optional
 
@@ -78,16 +79,16 @@ async def update(
         if field in update_data:
             setattr(account, field, update_data[field])
 
-    session.add(account)
-    await session.commit()
+    if "password" in update_data and update_data["password"] is not None:
+        pprint.pp("***************")
+        pprint.pp("***************")
+        pprint.pp(account_data)
+        pprint.pp(update_data["password"])
+        pprint.pp("***************")
+        pprint.pp("***************")
+        setattr(account, "password", update_data["password"])
 
-    logger.info(
-        "Account updated successfully with={}".format(
-            {
-                "user_id": account.id,
-            }
-        )
-    )
+    await session.commit()
 
     return account
 

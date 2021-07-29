@@ -2,8 +2,8 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.account.services.account import create
 from app.account.schemas import AccountCreate
+from app.account.services.account import create
 from app.database import async_session
 from app.main import api_router
 

@@ -4,8 +4,8 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_TITLE = "Fastapi SaaS"
-    APP_NAME: str = "fastapi-saas"
+    APP_TITLE = "SaaS Api"
+    APP_NAME: str = "saas-api"
     ADMIN_EMAIL: str = "fndmiranda@gmail.com"
     LOG_LEVEL: str = "INFO"
     DEFAULT_ITEMS_PER_PAGE: int = 5
@@ -15,11 +15,15 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ACCOUNT_EMAIL_VERIFY_ENABLE: bool = True
+    TESTING: bool = False
     ALGORITHM: str = "HS256"
-    SECRET_KEY: str
+    SECRET_KEY: str = (
+        "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+    )
+    CSRF_SECRET: str = "c852338422c9f6b8847cb736eab00a72b3168f9e"
 
     PASSWORD_RESET_EXPIRE_MINUTES: int = 60
-    MAIL_DEFAULT_FROM_NAME: str = "Fastapi SaaS"
+    MAIL_DEFAULT_FROM_NAME: str = "SaaS Api"
     MAIL_DEFAULT_FROM_EMAIL: str = "no-reply@yourdomain.com"
     SENDGRID_API_URL: str = "https://api.sendgrid.com/v3/mail/send"
     SENDGRID_API_KEY: str = "YourSendgridApiKey"

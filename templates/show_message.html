@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ app_title }}</title>
+
+    <!-- Styles -->
+    <link href="{{ url_for('static', path='/bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-light mb-5" style="background-color: #e3f2fd;">
+        <span></span>
+        <span class="navbar-text">
+            <h5>{{ app_title }}</h5>
+        </span>
+        <span></span>
+    </nav>
+    <div class="container-fluid">
+        <div>
+            <h4 style="color: {{ color }}">{{ message }}</h4>
+        </div>
+    </div>
+    <nav class="navbar navbar-light mt-5" style="background-color: #e3f2fd;">
+        <span></span>
+        <span class="navbar-text">
+          © {{ datetime.utcnow().year }} {{ app_title }}. Todos os direitos reservados.
+        </span>
+        <span></span>
+    </nav>
+</body>
+</html>

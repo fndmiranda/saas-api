@@ -1,31 +1,33 @@
-import pprint
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
-from typing import Optional
 
-import requests
+import httpx
 from fastapi import Request
-
-from fastapi.encoders import jsonable_encoder
 from fastapi.logger import logger
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.account.schemas import AccountCreate, AccountUpdate, \
-    PasswordResetCreate
-from app.address.models import Address
+from app.account.schemas import PasswordResetTokenCreate
 from app.config import get_settings
-from app.user.models import User, PasswordReset
-import httpx
-import asyncio
+from app.user.models import PasswordReset, User
 
 
 async def create_reset(
     session: AsyncSession,
-    reset_in: PasswordResetCreate,
+    reset_in: PasswordResetTokenCreate,
 ):
     """Create a new account password reset."""
     create_data = reset_in.dict()
+    settings = get_settings()
+
+    create_data.update(
+        {
+            "token": token_urlsafe(64),
+            "expire_at": datetime.now()
+            + timedelta(minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES),
+        }
+    )
 
     instance = PasswordReset(**create_data)
     session.add(instance)
@@ -38,9 +40,11 @@ async def send_mail_reset_password(
     *, account_id: int, name: str, email: str, url: str
 ):
     logger.info(
-        "Start send mail to account reset password with={}".format({
-            "user_id": account_id,
-        })
+        "Start send mail to account reset password with={}".format(
+            {
+                "user_id": account_id,
+            }
+        )
     )
 
     settings = get_settings()
@@ -54,32 +58,54 @@ async def send_mail_reset_password(
     }
 
     data = await _get_payload_send_email(
-        name=name, email=email, **kwargs,
+        name=name,
+        email=email,
+        **kwargs,
     )
 
     async with httpx.AsyncClient() as client:
-        pass
-        # response = await client.post(
-        #     settings.SENDGRID_API_URL,
-        #     json=data,
-        #     headers={
-        #         "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
-        #         "Content-Type": "application/json",
-        #     },
-        # )
-        #
-        # logger.info(
-        #     "Sent account email password reset token with={}".format({
-        #         "user_id": account_id,
-        #     })
-        # )
-        #
-        # return response
+        response = await client.post(
+            settings.SENDGRID_API_URL,
+            json=data,
+            headers={
+                "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
+                "Content-Type": "application/json",
+            },
+        )
+
+        logger.info(
+            "Sent account email password reset token with={}".format(
+                {
+                    "user_id": account_id,
+                }
+            )
+        )
+
+        return response
+
+
+async def is_valid_token(session: AsyncSession, token: str, email: str):
+    """Check if password reset token is valid."""
+    query = await session.execute(
+        select(PasswordReset)
+        .where(
+            PasswordReset.token == token,
+            PasswordReset.email == email,
+            PasswordReset.expire_at >= datetime.now(),
+        )
+        .with_only_columns(func.count())
+    )
+
+    is_valid = query.scalar_one()
+    await session.commit()
+
+    return bool(is_valid)
 
 
 async def _get_payload_send_email(name: str, email: str, **kwargs):
     """Get payload email to send."""
     from app.main import templates
+
     settings = get_settings()
 
     kwargs.setdefault("type", "text/html")
@@ -113,16 +139,16 @@ async def _get_payload_send_email(name: str, email: str, **kwargs):
 
 
 async def generate_password_reset_url(
-        *, account: User, request: Request
+    *, account: User, request: Request, token: str
 ):
-    """Generate password reset url"""
+    """Generate password reset url."""
     logger.info(
-        "Starting generate password reset url with={}".format({
-            "user_id": account.id,
-        })
+        "Starting generate password reset url with={}".format(
+            {
+                "user_id": account.id,
+            }
+        )
     )
-
-    token = token_urlsafe(64)
 
     url = "{}/?email={}&token={}".format(
         request.url_for("password_reset_form"), account.email, token
@@ -135,4 +161,4 @@ async def generate_password_reset_url(
             }
         )
     )
-    return url, token
+    return url

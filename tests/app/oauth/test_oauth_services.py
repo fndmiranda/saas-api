@@ -1,7 +1,7 @@
 import pytest
 
-from app.account.services.account import create
 from app.account.schemas import AccountCreate
+from app.account.services.account import create
 from app.auth.services import authenticate_user
 from app.database import async_session
 

@@ -19,6 +19,7 @@ def get_settings_override():
     return Settings(
         SQLALCHEMY_DATABASE_URI="sqlite+aiosqlite:///./instance/testing.db",
         ADMIN_EMAIL="testing_admin@example.com",
+        TESTING=True,
     )
 
 

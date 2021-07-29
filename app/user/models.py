@@ -51,7 +51,10 @@ class User(
         return compare_hash(crypt.crypt(password, self.salt), self.password)
 
 
-class PasswordReset(Base, ModelMixin,):
+class PasswordReset(
+    Base,
+    ModelMixin,
+):
     __tablename__ = "user_password_resets"
 
     email = sa.Column(sa.String(), nullable=False, index=True)
