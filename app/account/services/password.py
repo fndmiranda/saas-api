@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 
-import httpx
 from fastapi import Request
 from fastapi.logger import logger
 from sqlalchemy import func
@@ -34,54 +33,6 @@ async def create_reset(
     await session.commit()
 
     return instance
-
-
-async def send_mail_reset_password(
-    *, account_id: int, name: str, email: str, url: str
-):
-    logger.info(
-        "Start send mail to account reset password with={}".format(
-            {
-                "user_id": account_id,
-            }
-        )
-    )
-
-    settings = get_settings()
-
-    kwargs = {
-        "url": url,
-        "template_name": "password_reset_token_email.html",
-        "subject": "Notificação de redefinição de senha",
-        "expire_minutes": settings.PASSWORD_RESET_EXPIRE_MINUTES,
-        "button_title": "Redefinir senha",
-    }
-
-    data = await get_payload_send_email(
-        name=name,
-        email=email,
-        **kwargs,
-    )
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            settings.SENDGRID_API_URL,
-            json=data,
-            headers={
-                "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
-                "Content-Type": "application/json",
-            },
-        )
-
-        logger.info(
-            "Sent account email password reset token with={}".format(
-                {
-                    "user_id": account_id,
-                }
-            )
-        )
-
-        return response
 
 
 async def is_valid_token(session: AsyncSession, token: str, email: str):

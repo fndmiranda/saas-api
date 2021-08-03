@@ -1,14 +1,9 @@
 import pytest
-from fastapi import status
-from httpx import AsyncClient
 
 from app.account.schemas import Account, AccountCreate, AccountUpdate
 from app.account.services.account import create, update
-from app.account.services.password import send_mail_reset_password
 from app.auth.services import authenticate_user
 from app.database import async_session
-from tests.app.user.factories import UserFactory
-from tests.utils import vcr
 
 
 @pytest.mark.asyncio
@@ -71,19 +66,3 @@ async def test_account_service_should_update(
             password=password,
         )
         assert user is not False
-
-
-@pytest.mark.asyncio
-@vcr.use_cassette()
-async def test_account_service_should_send_mail_reset_password(
-    client: AsyncClient,
-):
-    """Test account service should send mail reset password."""
-
-    user = await UserFactory.create()
-
-    response = await send_mail_reset_password(
-        account_id=user.id, name=user.name, email=user.email, url="testing_url"
-    )
-
-    assert response.status_code == status.HTTP_202_ACCEPTED

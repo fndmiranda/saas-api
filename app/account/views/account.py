@@ -7,11 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.account.schemas import Account, AccountCreate, AccountUpdate
 from app.account.services.account import create, delete, update
 from app.account.services.verified import generate_verify_email_url
-from app.account.tasks import send_mail_verification
 from app.account.validators import validate_account
 from app.auth.depends import current_user_verified
 from app.config import get_settings
 from app.depends import get_session
+from app.notification.tasks import send_mail_verification
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -47,8 +47,6 @@ async def create_account(
         url = await generate_verify_email_url(account=account, request=request)
         task_id = send_mail_verification.delay(
             account_id=account.id,
-            name=account.name,
-            email=account.email,
             url=url,
         )
         logger.info(

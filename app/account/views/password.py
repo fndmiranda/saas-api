@@ -14,9 +14,9 @@ from app.account.services.password import (
     generate_password_reset_url,
     is_valid_token,
 )
-from app.account.tasks import send_mail_reset_password
 from app.config import get_settings
 from app.depends import get_session
+from app.notification.tasks import send_mail_reset_password
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -48,8 +48,6 @@ async def create_password_reset_token(
 
         task_id = send_mail_reset_password.delay(
             account_id=account.id,
-            name=account.name,
-            email=account.email,
             url=url,
         )
 

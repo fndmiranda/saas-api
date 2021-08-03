@@ -12,10 +12,10 @@ from app.account.services.verified import (
     mark_email_as_verified,
     signature_is_valid,
 )
-from app.account.tasks import send_mail_verification
 from app.auth.depends import current_user
 from app.config import get_settings
 from app.depends import get_session
+from app.notification.tasks import send_mail_verification
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -66,8 +66,6 @@ async def resend_email_verified(
     url = await generate_verify_email_url(account=account_in, request=request)
     task_id = send_mail_verification.delay(
         account_id=account_in.id,
-        name=account_in.name,
-        email=account_in.email,
         url=url,
     )
     logger.info(
