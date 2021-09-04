@@ -1,5 +1,5 @@
-fastapi==0.67.0
-uvicorn[standard]==0.14.0
+fastapi==0.68.0
+uvicorn[standard]==0.15.0
 httpx[http2]==0.18.2
 SQLAlchemy==1.4.22
 alembic==1.6.5
