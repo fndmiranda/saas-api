@@ -2,14 +2,21 @@ import math
 from collections import namedtuple
 
 from sqlalchemy import func
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.filters.exceptions import InvalidPage
 
 
 async def apply_pagination(
-    stmt, session, model, page_number=None, page_size=None
+    stmt, session: AsyncSession, page_number=None, page_size=None
 ):
     """Apply pagination to a SQLAlchemy stmt object.
+
+    :param stmt:
+        A :class:`sqlalchemy.sql.selectable.Select` instance.
+
+    :param session:
+        A :class:`sqlalchemy.ext.asyncio.AsyncSession` instance.
 
     :param page_number:
         Page to be returned (starts and defaults to 1).

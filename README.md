@@ -13,7 +13,7 @@ This project simplifies the creation of a Python SaaS api with the FastAPI frame
 * Authentication with OAuth2
 * Account
   * User Account Crud
-  * Email password recovery feature
+  * Email password recovery
   * Registration email verification
 * Notification
   * Strategy for notifications
@@ -105,3 +105,18 @@ Execute the following command to list all registered routes:
 
 ```terminal
 $ make show-routes
+```
+
+## Pagination with dynamic filter and sorting.
+
+Pass the `filter` field in query string, as in the example:
+
+`[{"field":"foo", "op":"ilike", "value":"%bar%"}]`
+
+Operators options are:
+
+`is_null, is_not_null, eq, ne, gt, lt, ge, le, like, ilike, not_ilike, in, not_in, any, not_any`
+
+Pass the `sort` field in query string, as in the example:
+
+`[{"field":"foo", "direction":"asc"}]`

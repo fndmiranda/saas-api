@@ -14,7 +14,7 @@ from app.address.schemas import (
 )
 from app.address.services import create, delete, get, update
 from app.auth.depends import current_user_verified
-from app.core.depends import common_parameters
+from app.core.depends import pagination_parameters
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 
@@ -66,7 +66,7 @@ async def create_account_address(
 async def get_account_addresses(
     *,
     session: AsyncSession = Depends(get_session),
-    common: dict = Depends(common_parameters),
+    common: dict = Depends(pagination_parameters),
     account: Account = Depends(current_user_verified),
 ):
     common["filter_spec"].append(

@@ -75,13 +75,12 @@ async def test_store_view_should_get_segments(client: AsyncClient):
 
     filter_spec = [
         {
-            "model": "Segment",
             "field": "title",
             "op": "ilike",
             "value": "%segment title%",
         }
     ]
-    sort_spec = [{"model": "Segment", "field": "id", "direction": "desc"}]
+    sort_spec = [{"field": "id", "direction": "desc"}]
 
     response = await client.get(
         api_router.url_path_for("get_segments"),

@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.depends import current_user_admin, current_user_verified
-from app.core.depends import common_parameters
+from app.core.depends import pagination_parameters
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.models import Segment as SegmentModel
@@ -61,7 +61,7 @@ async def create_segment(
 async def get_segments(
     *,
     session: AsyncSession = Depends(get_session),
-    common: dict = Depends(common_parameters),
+    common: dict = Depends(pagination_parameters),
 ):
     logger.info(f"Starting get segments with={common}")
 

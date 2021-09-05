@@ -1,4 +1,5 @@
 import logging
+from importlib import resources
 
 from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -20,7 +21,7 @@ settings = get_settings()
 
 app = FastAPI(
     title=settings.APP_TITLE,
-    description=settings.APP_DESCRIPTION,
+    description=resources.read_text(__package__, "openapi.md"),
     version=__version__,
     middleware=[
         Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY),

@@ -14,7 +14,7 @@ from app.address.schemas import (
 )
 from app.address.services import create, delete, get, update
 from app.auth.depends import current_user_verified
-from app.core.depends import common_parameters
+from app.core.depends import pagination_parameters
 from app.core.services import search_filter_sort_paginate
 from app.depends import get_session
 from app.store.services.store import get as get_store
@@ -81,7 +81,7 @@ async def create_store_address(
 async def get_store_addresses(
     *,
     session: AsyncSession = Depends(get_session),
-    common: dict = Depends(common_parameters),
+    common: dict = Depends(pagination_parameters),
     store_id: int,
 ):
     common["filter_spec"].append(
