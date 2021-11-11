@@ -120,3 +120,89 @@ Operators options are:
 Pass the `sort` field in query string, as in the example:
 
 `[{"field":"foo", "direction":"asc"}]`
+
+## Api documentation
+
+The base address of RESTful API is [http://localhost:8000](http://localhost:8000)
+and Swagger documentation is [http://localhost:8000/docs](http://localhost:8000/docs)
+
+## Display registered routes.
+
+Execute the following command to list all registered routes:
+
+```terminal
+$ make show-routes
+```
+
+## Outdated packages
+
+Execute the following command to list outdated packages:
+
+```terminal
+$ make outdated
+```
+
+## Celery
+
+Execute the following command to run celery task queues:
+
+```terminal
+$ make runcelery
+```
+
+Execute the following command to run flower:
+Flower is a web based tool for monitoring and administrating Celery clusters
+
+```terminal
+$ make runflower
+```
+
+## Testing
+
+### Unit tests
+
+Execute the following command to run all tests:
+
+```terminal
+$ make test
+```
+
+Execute the following command to run test with name match, example:
+
+```terminal
+$ make test-matching test=test_store_view_should_get_segments
+```
+
+Execute the following command to run celery task queues in tenting mode:
+
+```terminal
+$ make runcelery-test
+```
+
+Execute the following command to run test with coverage reports, example:
+
+```terminal
+$ make coverage
+```
+
+## Lint
+
+Execute the following command to check lint:
+
+```terminal
+$ make check-lint
+```
+
+Execute the following command to try fix lint:
+
+```terminal
+$ make lint
+```
+
+## Security
+
+Execute the following command to check security vulnerabilities in packages:
+
+```terminal
+$ make check-safety
+```
