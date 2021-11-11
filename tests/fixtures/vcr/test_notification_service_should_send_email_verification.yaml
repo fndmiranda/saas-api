@@ -20,7 +20,7 @@ interactions:
       accept-encoding:
       - gzip, deflate
       authorization:
-      - Bearer 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
+      - Bearer {token}
       connection:
       - keep-alive
       content-length:
