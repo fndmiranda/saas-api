@@ -2,26 +2,20 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.account.schemas import AccountCreate
-from app.database import async_session
 from app.main import api_router
-from app.user.services import UserService
+from tests.app.user.factories import UserFactory
 
 
 @pytest.mark.asyncio
 async def test_oauth_view_should_create_token(
-    client: AsyncClient, account_create_body
+    client: AsyncClient, account_primary
 ):
     """Test oauth view should create token."""
-
-    async with async_session() as session:
-        await UserService().create(
-            session=session, account=AccountCreate(**account_create_body)
-        )
+    user = await UserFactory.create(password="testpass")
 
     data = {
-        "username": account_create_body["email"],
-        "password": account_create_body["password"],
+        "username": user.email,
+        "password": "testpass",
         "grant_type": "password",
     }
 
@@ -35,18 +29,12 @@ async def test_oauth_view_should_create_token(
 
 
 @pytest.mark.asyncio
-async def test_oauth_view_not_should_create_token(
-    client: AsyncClient, account_create_body
-):
+async def test_oauth_view_not_should_create_token(client: AsyncClient):
     """Test oauth view not should create token."""
-
-    async with async_session() as session:
-        await UserService().create(
-            session=session, account=AccountCreate(**account_create_body)
-        )
+    user = await UserFactory.create()
 
     data = {
-        "username": account_create_body["email"],
+        "username": user.email,
         "password": "invalid",
         "grant_type": "password",
     }

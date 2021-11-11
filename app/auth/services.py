@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
-from typing import Optional
 
 from jose import jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.config import Settings
+from app.config import get_settings
 from app.user.models import User
 
 
@@ -22,15 +21,15 @@ async def authenticate_user(
     return False
 
 
-async def create_access_token(
-    data: dict,
-    settings: Settings,
-    expires_delta: Optional[timedelta] = timedelta(minutes=15),
-):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
+async def create_access_token(user: User):
+    settings = get_settings()
+    access_token_expires = timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    to_encode = {"sub": user.email}
+    expire = datetime.utcnow() + access_token_expires
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
-    return encoded_jwt
+    return {"access_token": encoded_jwt, "token_type": "bearer"}

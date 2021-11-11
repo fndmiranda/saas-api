@@ -1,44 +1,40 @@
 import pytest
 
 from app.account.schemas import AccountCreate
+from app.account.services.account import create
+from app.auth.services import authenticate_user
 from app.database import async_session
-from app.oauth.services import authenticate_user
-from app.user.services import UserService
+from tests.app.user.factories import UserFactory
 
 
 @pytest.mark.asyncio
-async def test_oauth_service_should_authenticate_user(
-    app, account_create_body
-):
+async def test_oauth_service_should_authenticate_user(app, account_primary):
     """Test oauth service should authenticate user."""
+    user = await UserFactory.create(password="testpass")
 
     async with async_session() as session:
-        await UserService().create(
-            session=session, account=AccountCreate(**account_create_body)
+        account = await authenticate_user(
+            session=session,
+            username=user.email,
+            password="testpass",
         )
-
-    user = await authenticate_user(
-        session=session,
-        username=account_create_body["email"],
-        password=account_create_body["password"],
-    )
-    assert user is not False
+        assert account is not False
 
 
 @pytest.mark.asyncio
 async def test_oauth_service_not_should_authenticate_user(
-    app, account_create_body
+    app, account_primary
 ):
     """Test oauth service not should authenticate user."""
 
     async with async_session() as session:
-        await UserService().create(
-            session=session, account=AccountCreate(**account_create_body)
+        await create(
+            session=session, account_in=AccountCreate(**account_primary)
         )
 
     user = await authenticate_user(
         session=session,
-        username=account_create_body["email"],
+        username=account_primary["email"],
         password="invalid",
     )
     assert user is False

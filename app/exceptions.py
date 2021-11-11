@@ -1,14 +1,14 @@
-class DispatchException(Exception):
+class CoreException(Exception):
     pass
 
 
-class InvalidConfiguration(DispatchException):
+class InvalidConfiguration(CoreException):
     pass
 
 
-class InvalidFilterPolicy(DispatchException):
+class InvalidFilterPolicy(CoreException):
     pass
 
 
-class DispatchPluginException(DispatchException):
+class DispatchPluginException(CoreException):
     pass

@@ -13,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "c2aae64d1f68"
-down_revision = None
+down_revision = "a12a42f449f6"
 branch_labels = None
 depends_on = None
 
@@ -25,11 +25,11 @@ def upgrade():
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("email", sa.String(), nullable=False),
         sa.Column("nickname", sa.String(), nullable=False),
-        sa.Column("document_number", sa.String(), nullable=False),
+        sa.Column("document_number", sa.String(), nullable=True),
         sa.Column("phones", sa.JSON(), nullable=True),
         sa.Column("avatar", sa.JSON(), nullable=True),
         sa.Column("external_data", sa.JSON(), nullable=True),
-        sa.Column("birthdate", sa.Date(), nullable=False),
+        sa.Column("birthdate", sa.Date(), nullable=True),
         sa.Column("password", sa.String(), nullable=False),
         sa.Column("is_admin", sa.Boolean(), nullable=False),
         sa.Column("is_celebrity", sa.Boolean(), nullable=False),
@@ -48,7 +48,18 @@ def upgrade():
         sa.UniqueConstraint("email"),
         sa.UniqueConstraint("nickname"),
     )
+    op.create_table(
+        "user_password_resets",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("email", sa.String(), nullable=False),
+        sa.Column("token", sa.String(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=True),
+        sa.Column("expire_at", sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("email"),
+    )
 
 
 def downgrade():
+    op.drop_table("user_password_resets")
     op.drop_table("user_users")

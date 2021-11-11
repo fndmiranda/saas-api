@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ app_title }}</title>
+</head>
+<body>
+    <h3>{{ app_title }}</h3>
+    <h5>Olá!</h5>
+    <div>Por favor, clique no botão abaixo para verificar seu endereço de e-mail.</div>
+    <a href="{{ url }}">{{ button_title }}</a>
+    <div>Se você não criou uma conta, ignore este e-mail.</div>
+    <div>Atenciosamente,</div>
+    <div>{{ app_title }}</div>
+    <hr />
+    <div>
+        Se você estiver tendo problemas para clicar no botão "{{ button_title }}", copie o URL abaixo e cole em seu navegador:
+        <a href="{{ url }}">{{ url }}</a>
+    </div>
+    <div>© {{ datetime.utcnow().year }} {{ app_title }}. Todos os direitos reservados.</div>
+</body>
+</html>
