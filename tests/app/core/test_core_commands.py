@@ -7,8 +7,8 @@ runner = CliRunner()
 
 
 @pytest.mark.asyncio
-async def test_cli_should_show_routes():
-    """Test cli should show routes."""
+async def test_core_cli_should_show_routes():
+    """Test core cli should show routes."""
 
     result = runner.invoke(cli, ["route", "show"])
     assert result.exit_code == 0
