@@ -1,40 +1,39 @@
 # -*- coding: utf-8 -*-
 
 from .exceptions import BadSortFormat
-from .models import Field, auto_join, get_model_from_spec, get_default_model
+from .models import Field, auto_join, get_default_model, get_model_from_spec
 
-SORT_ASCENDING = 'asc'
-SORT_DESCENDING = 'desc'
+SORT_ASCENDING = "asc"
+SORT_DESCENDING = "desc"
 
 
 class Sort(object):
-
     def __init__(self, sort_spec):
         self.sort_spec = sort_spec
 
         try:
-            field_name = sort_spec['field']
-            direction = sort_spec['direction']
+            field_name = sort_spec["field"]
+            direction = sort_spec["direction"]
         except KeyError:
             raise BadSortFormat(
-                '`field` and `direction` are mandatory attributes.'
+                "`field` and `direction` are mandatory attributes."
             )
         except TypeError:
             raise BadSortFormat(
-                'Sort spec `{}` should be a dictionary.'.format(sort_spec)
+                "Sort spec `{}` should be a dictionary.".format(sort_spec)
             )
 
         if direction not in [SORT_ASCENDING, SORT_DESCENDING]:
-            raise BadSortFormat('Direction `{}` not valid.'.format(direction))
+            raise BadSortFormat("Direction `{}` not valid.".format(direction))
 
         self.field_name = field_name
         self.direction = direction
-        self.nullsfirst = sort_spec.get('nullsfirst')
-        self.nullslast = sort_spec.get('nullslast')
+        self.nullsfirst = sort_spec.get("nullsfirst")
+        self.nullslast = sort_spec.get("nullslast")
 
     def get_named_models(self):
         if "model" in self.sort_spec:
-            return {self.sort_spec['model']}
+            return {self.sort_spec["model"]}
         return set()
 
     def format_for_sqlalchemy(self, query, default_model):

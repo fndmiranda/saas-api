@@ -10,13 +10,14 @@ show-routes:
 requirements-dev:
 	@pip install --upgrade pip
 	@pip install setuptools wheel
-	@pip install -r requirements/development.txt
+	@pipenv install --dev
 	@pip install -e .
 
 requirements:
 	@pip install --upgrade pip
 	@pip install setuptools wheel
-	@pip install -r requirements/production.txt
+	@pipenv install
+	@pip install -e .
 
 runserver-dev:
 	@uvicorn app.main:app --reload
