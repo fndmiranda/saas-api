@@ -1,6 +1,7 @@
 # Python SaaS application boilerplate (asynchronous)
 
-This project simplifies the creation of a Python SaaS api with the FastAPI framework and SQLAlchemy.
+This project simplifies the creation of a Python SaaS api with the 
+FastAPI framework, SQLAlchemy and Pipenv to create and manage a virtualenv.
 
 * FastAPI framework
 * SQLAlchemy (asynchronous) SQL toolkit and Object Relational Mapper
@@ -23,11 +24,37 @@ This project simplifies the creation of a Python SaaS api with the FastAPI frame
 * Address
   * Address with a so-called "generic foreign key" to accounts and stores
                                                                                                                         
-## Installation
+### Prepare environment
 
-### Virtualenv
+Install Pyenv for Python version management.
 
-Create a Python version 3.9 environment and activate it.
+Pyenv installation instructions can be found in
+[Pyenv page](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+
+Install Python 3.10.
+
+```terminal
+$ pyenv install 3.10
+```
+
+Install Pipenv.
+
+```terminal
+$ pip install --user pipenv
+```
+
+More detailed about Pipenv installation instructions can be found in 
+the [Pipenv page](https://pipenv.pypa.io/en/latest/).
+
+Create a new virtualenv using Python 3.10.
+```terminal
+$ pipenv --python 3.10
+```
+
+Spawns a shell within the virtualenv.
+```terminal
+$ pipenv shell
+```
 
 ### Install dependencies
 
@@ -85,7 +112,7 @@ Execute the following command to list the history of migrations:
 $ alembic history
 ```
 
-### Run application
+## Run application
 
 Execute the following command to run the application in a development environment:
 
@@ -99,7 +126,7 @@ Execute the following command to run the application with gunicorn:
 $ make runserver
 ```
 
-## Display registered routes.
+### Display registered routes.
 
 Execute the following command to list all registered routes:
 
@@ -107,7 +134,7 @@ Execute the following command to list all registered routes:
 $ make show-routes
 ```
 
-## Pagination with dynamic filter and sorting.
+### Pagination with dynamic filter and sorting.
 
 Pass the `filter` field in query string, as in the example:
 
@@ -121,18 +148,10 @@ Pass the `sort` field in query string, as in the example:
 
 `[{"field":"foo", "direction":"asc"}]`
 
-## Api documentation
+### Api documentation
 
 The base address of RESTful API is [http://localhost:8000](http://localhost:8000)
 and Swagger documentation is [http://localhost:8000/docs](http://localhost:8000/docs)
-
-## Display registered routes.
-
-Execute the following command to list all registered routes:
-
-```terminal
-$ make show-routes
-```
 
 ## Outdated packages
 

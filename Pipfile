@@ -1,0 +1,40 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "~=0.70"
+uvicorn = {extras = ["standard"], version = "~=0.16"}
+httpx = {extras = ["http2"], version = "~=0.21"}
+sqlalchemy = "~=1.4"
+alembic = "~=1.7"
+python-dotenv = "~=0.19"
+typer = {extras = ["all"], version = "~=0.4"}
+python-multipart = "~=0.0"
+python-jose = {extras = ["cryptography"], version = "~=3.3"}
+tabulate = "~=0.8"
+aiofiles = "~=0.8"
+jinja2 = "~=3.0"
+celery = "~=5.2"
+flower = "~=1.0"
+redis = "~=4.0"
+starlette-wtf = "~=0.4"
+email-validator = "~=1.1"
+psycopg2-binary = "~=2.9"
+
+[dev-packages]
+aiosqlite = "~=0.17"
+pytest = "~=6.2"
+pytest-asyncio = "~=0.16"
+flake8 = "~=4.0"
+isort = "~=5.10"
+black = "==21.12b0"
+bandit = "~=1.7"
+factory-boy = "~=3.2"
+pytest-cov = "~=3.0"
+pytest-deadfixtures = "~=2.2"
+vcrpy = "~=4.1"
+
+[requires]
+python_version = "3.10"
